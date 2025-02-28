@@ -47,7 +47,7 @@ public class ClothingServiceImpl implements ClothingService {
         Clothing clothing = new Clothing(clothingDTO.getName(),
                 clothingDTO.getDescription(),
                 setPrice(clothingDTO.getType()),
-                clothingDTO.getModel().substring(0, 4) + getModelType(clothingDTO.getType()),
+                clothingDTO.getModel().substring(0, 3),
                 clothingDTO.getType(),
                 clothingDTO.getCategory());
 
@@ -93,7 +93,7 @@ public class ClothingServiceImpl implements ClothingService {
             return false;
         }
 
-        Optional<Clothing> byModelAndType = this.clothingRepository.findByModelAndType(clothingDTO.getModel() + getModelType(clothingDTO.getType()), clothingDTO.getType());
+        Optional<Clothing> byModelAndType = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
         if (byModelAndType.isPresent()) {
             if (clothing.getId() != byModelAndType.get().getId()) {
                 throw new ClothingAlreadyExistsException("Clothing with model " + clothingDTO.getModel() + " already exists.");
@@ -225,26 +225,6 @@ public class ClothingServiceImpl implements ClothingService {
         return price;
     }
 
-    private String getModelType(Type type) {
-        switch (type) {
-            case SHORTS -> {
-                return "K";
-            }
-            case SWEATSHIRT -> {
-                return "SW";
-            }
-            case LONG_T_SHIRT -> {
-                return "D";
-            }
-            case KIT -> {
-                return "KT";
-            }
-            default -> {
-                return "";
-            }
-        }
-    }
-
     private void addImagesToKit(ClothingPageDTO clothing, String model) {
         this.clothingRepository.findByModel(model)
                 .ifPresent(foundClothing -> {
@@ -268,7 +248,7 @@ public class ClothingServiceImpl implements ClothingService {
         cloth.setName(clothDto.getName());
         cloth.setDescription(clothDto.getDescription());
         cloth.setPrice(setPrice(clothDto.getType()));
-        cloth.setModel(clothDto.getModel().substring(0, 4) + getModelType(clothDto.getType()));
+        cloth.setModel(clothDto.getModel().substring(0, 3));
         cloth.setType(clothDto.getType());
         cloth.setCategory(clothDto.getCategory());
     }

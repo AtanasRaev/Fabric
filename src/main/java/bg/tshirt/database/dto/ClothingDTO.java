@@ -21,7 +21,7 @@ public class ClothingDTO {
     private Category category;
 
     @NotBlank(message = "Model cannot be blank.")
-    @Size(min = 4, max = 6, message = "Model must be exactly 4 characters")
+    @Size(min = 3, max = 3, message = "Model must be exactly 3 characters")
     private String model;
 
     private MultipartFile frontImage;
