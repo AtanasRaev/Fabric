@@ -1,6 +1,5 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.ClothingDTO;
 import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import org.springframework.web.multipart.MultipartFile;

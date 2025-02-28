@@ -1,6 +1,6 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.*;
+import bg.tshirt.database.dto.clothes.*;
 import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.entity.OrderItem;

@@ -1,6 +1,6 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.database.dto.user.UserDTO;
 import bg.tshirt.database.entity.PasswordResetToken;
 import bg.tshirt.database.repository.PasswordResetTokenRepository;
 import bg.tshirt.service.EmailService;

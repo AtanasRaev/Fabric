@@ -1,9 +1,9 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.UserDTO;
-import bg.tshirt.database.dto.UserProfileDTO;
-import bg.tshirt.database.dto.UserRegistrationDTO;
+import bg.tshirt.database.dto.user.UserDTO;
+import bg.tshirt.database.dto.user.UserProfileDTO;
+import bg.tshirt.database.dto.user.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
 import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.database.repository.UserRepository;
@@ -11,7 +11,6 @@ import bg.tshirt.exceptions.EmailAlreadyInUseException;
 import bg.tshirt.exceptions.ForbiddenException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.exceptions.UnauthorizedException;
-import bg.tshirt.service.OrderService;
 import bg.tshirt.service.UserService;
 import bg.tshirt.utils.PhoneNumberUtils;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.user;
 
 import bg.tshirt.database.entity.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;

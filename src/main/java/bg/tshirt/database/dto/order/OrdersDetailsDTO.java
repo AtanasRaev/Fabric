@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto.econtDTO;
+package bg.tshirt.database.dto.econt;
 
 import java.util.ArrayList;
 import java.util.List;

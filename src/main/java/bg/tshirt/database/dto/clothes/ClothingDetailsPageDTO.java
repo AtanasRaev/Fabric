@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.clothes;
 
 import bg.tshirt.database.entity.enums.Category;
 

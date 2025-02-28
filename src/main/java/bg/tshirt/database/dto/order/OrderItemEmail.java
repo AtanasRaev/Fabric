@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.order;
 
 public class OrderItemEmail {
     private String name;

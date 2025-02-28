@@ -1,7 +1,7 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.config.EcontConfig;
-import bg.tshirt.database.dto.econtDTO.*;
+import bg.tshirt.database.dto.econt.*;
 import bg.tshirt.service.EcontCityService;
 import bg.tshirt.service.EcontOfficesService;
 import org.springframework.stereotype.Service;

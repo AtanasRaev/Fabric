@@ -1,9 +1,9 @@
 package bg.tshirt.web;
 
-import bg.tshirt.database.dto.OrderDTO;
-import bg.tshirt.database.dto.OrderPageDTO;
-import bg.tshirt.database.dto.OrdersDetailsDTO;
-import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.database.dto.order.OrderDTO;
+import bg.tshirt.database.dto.order.OrderPageDTO;
+import bg.tshirt.database.dto.order.OrdersDetailsDTO;
+import bg.tshirt.database.dto.user.UserDTO;
 import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.exceptions.UnauthorizedException;

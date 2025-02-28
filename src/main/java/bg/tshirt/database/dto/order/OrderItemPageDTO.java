@@ -1,4 +1,6 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.order;
+
+import bg.tshirt.database.dto.clothes.ClothingPageDTO;
 
 public class OrderItemPageDTO {
     private Long id;

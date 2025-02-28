@@ -1,10 +1,9 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.OrderDTO;
-import bg.tshirt.database.dto.OrderPageDTO;
-import bg.tshirt.database.dto.OrdersDetailsDTO;
-import bg.tshirt.database.dto.UserDTO;
-import bg.tshirt.database.entity.User;
+import bg.tshirt.database.dto.order.OrderDTO;
+import bg.tshirt.database.dto.order.OrderPageDTO;
+import bg.tshirt.database.dto.order.OrdersDetailsDTO;
+import bg.tshirt.database.dto.user.UserDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

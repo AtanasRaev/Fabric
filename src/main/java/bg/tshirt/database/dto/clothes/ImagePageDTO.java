@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.clothes;
 
 public class ImagePageDTO {
     private String path;

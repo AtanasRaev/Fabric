@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto.econtDTO;
+package bg.tshirt.database.dto.econt;
 
 public class EcontOfficesDTO {
     private String name;

@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.clothes;
 
 import java.util.ArrayList;
 import java.util.List;

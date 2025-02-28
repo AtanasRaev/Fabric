@@ -1,8 +1,8 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.config.EcontConfig;
-import bg.tshirt.database.dto.econtDTO.EcontBodyApi;
-import bg.tshirt.database.dto.econtDTO.EcontCitiesResponseDTO;
+import bg.tshirt.database.dto.econt.EcontBodyApi;
+import bg.tshirt.database.dto.econt.EcontCitiesResponseDTO;
 import bg.tshirt.service.EcontCityService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

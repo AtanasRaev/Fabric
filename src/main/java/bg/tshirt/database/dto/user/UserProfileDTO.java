@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.user;
 
 public class UserProfileDTO extends UserDTO {
     private String firstName;

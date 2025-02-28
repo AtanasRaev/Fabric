@@ -1,6 +1,11 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.*;
+import bg.tshirt.database.dto.clothes.ClothingDetailsPageDTO;
+import bg.tshirt.database.dto.order.OrderDTO;
+import bg.tshirt.database.dto.order.OrderItemDTO;
+import bg.tshirt.database.dto.order.OrderPageDTO;
+import bg.tshirt.database.dto.order.OrdersDetailsDTO;
+import bg.tshirt.database.dto.user.UserDTO;
 import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Order;
 import bg.tshirt.database.entity.OrderItem;
@@ -22,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

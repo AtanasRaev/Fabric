@@ -1,4 +1,4 @@
-package bg.tshirt.database.dto;
+package bg.tshirt.database.dto.order;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;

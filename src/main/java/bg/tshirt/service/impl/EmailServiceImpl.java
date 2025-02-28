@@ -1,6 +1,6 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.OrderItemEmail;
+import bg.tshirt.database.dto.order.OrderItemEmail;
 import bg.tshirt.database.entity.Order;
 import bg.tshirt.service.EmailService;
 import com.mailjet.client.MailjetClient;

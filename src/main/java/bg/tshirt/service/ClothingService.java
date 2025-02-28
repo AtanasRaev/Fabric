@@ -1,6 +1,9 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.*;
+import bg.tshirt.database.dto.clothes.ClothEditDTO;
+import bg.tshirt.database.dto.clothes.ClothingDTO;
+import bg.tshirt.database.dto.clothes.ClothingDetailsPageDTO;
+import bg.tshirt.database.dto.clothes.ClothingPageDTO;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.entity.enums.Category;
 import org.springframework.data.domain.Page;

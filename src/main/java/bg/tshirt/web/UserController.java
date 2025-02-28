@@ -1,7 +1,7 @@
 package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.*;
+import bg.tshirt.database.dto.user.*;
 import bg.tshirt.service.PasswordResetService;
 import bg.tshirt.service.RefreshTokenService;
 import bg.tshirt.service.UserService;

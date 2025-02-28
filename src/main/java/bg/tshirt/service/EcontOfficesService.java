@@ -1,6 +1,6 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.econtDTO.EcontOfficesDTO;
+import bg.tshirt.database.dto.econt.EcontOfficesDTO;
 
 import java.util.List;
 

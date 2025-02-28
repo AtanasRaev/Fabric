@@ -1,6 +1,10 @@
 package bg.tshirt.web;
 
-import bg.tshirt.database.dto.*;
+import bg.tshirt.database.dto.clothes.ClothEditDTO;
+import bg.tshirt.database.dto.clothes.ClothingDTO;
+import bg.tshirt.database.dto.clothes.ClothingDetailsPageDTO;
+import bg.tshirt.database.dto.clothes.ClothingPageDTO;
+import bg.tshirt.database.dto.user.UserDTO;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.UserService;
