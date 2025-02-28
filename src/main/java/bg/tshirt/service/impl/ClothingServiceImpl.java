@@ -11,6 +11,7 @@ import bg.tshirt.exceptions.ClothingAlreadyExistsException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.ImageService;
+import bg.tshirt.service.PriceService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,13 +26,16 @@ import java.util.stream.Collectors;
 @Service
 public class ClothingServiceImpl implements ClothingService {
     private final ClothingRepository clothingRepository;
+    private final PriceService priceService;
     private final ImageService imageService;
     private final ModelMapper modelMapper;
 
     public ClothingServiceImpl(ClothingRepository clothRepository,
+                               PriceService priceService,
                                ImageService imageService,
                                ModelMapper modelMapper) {
         this.clothingRepository = clothRepository;
+        this.priceService = priceService;
         this.imageService = imageService;
         this.modelMapper = modelMapper;
     }
@@ -212,17 +216,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     private Double setPrice(Type type) {
-        double price;
-
-        switch (type) {
-            case T_SHIRT -> price = 29.00;
-            case SWEATSHIRT -> price = 54.00;
-            case KIT -> price = 59.00;
-            case SHORTS -> price = 30.00;
-            default -> price = 37.00;
-        }
-
-        return price;
+        return this.priceService.getPriceByType(type);
     }
 
     private void addImagesToKit(ClothingPageDTO clothing, String model) {

@@ -2,6 +2,7 @@ package bg.tshirt.service.impl;
 
 import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
+import bg.tshirt.database.entity.enums.Type;
 import bg.tshirt.database.repository.ImageRepository;
 import bg.tshirt.service.ImageService;
 import com.cloudinary.Cloudinary;
@@ -12,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static bg.tshirt.database.entity.enums.Type.*;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -63,7 +66,7 @@ public class ImageServiceImpl implements ImageService {
             return null;
         }
 
-        String uniqueImageFront = cloth.getModel() + "_" + side;
+        String uniqueImageFront = cloth.getModel() + getModelType(cloth.getType()) + "_" + side;
         return uploadImage(file, uniqueImageFront, cloth);
     }
 
@@ -89,6 +92,26 @@ public class ImageServiceImpl implements ImageService {
             return url.substring(startIndex);
         }
         throw new IllegalArgumentException("Invalid Cloudinary URL format.");
+    }
+
+    private String getModelType(Type type) {
+        switch (type) {
+            case SHORTS -> {
+                return "K";
+            }
+            case SWEATSHIRT -> {
+                return "SW";
+            }
+            case LONG_T_SHIRT -> {
+                return "D";
+            }
+            case KIT -> {
+                return "KT";
+            }
+            default -> {
+                return "";
+            }
+        }
     }
 
     private void deleteImageFromCloudinary(String publicId) {
