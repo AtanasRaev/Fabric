@@ -120,6 +120,40 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @Override
+    public boolean editUser(UserRegistrationDTO userEditDTO, HttpServletRequest request) {
+        UserDTO userDTO = this.validateUser(request);
+
+        Optional<User> optionalUser = this.userRepository.findByEmail(userDTO.getEmail());
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
+
+        User user = optionalUser.get();
+
+        this.phoneNumberUtils.validateBulgarianPhoneNumber(userEditDTO.getPhoneNumber());
+
+        if (!user.getEmail().equals(userEditDTO.getEmail()) && this.userRepository.existsByEmail(userEditDTO.getEmail())) {
+            throw new EmailAlreadyInUseException("Email is already in use");
+        }
+
+        if (userEditDTO.getPassword() != null && !userEditDTO.getPassword().isBlank()) {
+            user.setPassword(this.passwordEncoder.encode(userEditDTO.getPassword()));
+        }
+
+        user.setFirstName(userEditDTO.getFirstName());
+        user.setLastName(userEditDTO.getLastName());
+        user.setCity(userEditDTO.getCity());
+        user.setRegion(userEditDTO.getRegion());
+        user.setAddress(userEditDTO.getAddress());
+        user.setEmail(userEditDTO.getEmail());
+        user.setPhoneNumber(userEditDTO.getPhoneNumber());
+
+        saveUser(user);
+        return true;
+    }
+
+
     private void saveUser(User user) {
         this.userRepository.save(user);
     }

@@ -21,4 +21,6 @@ public interface UserService {
     List<String> getUserRoles(String accessToken);
 
     boolean resetUserPassword(UserDTO userDTO);
+
+    boolean editUser(UserRegistrationDTO userEditDTO, HttpServletRequest request);
 }
