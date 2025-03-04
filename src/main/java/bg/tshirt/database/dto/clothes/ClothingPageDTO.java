@@ -13,6 +13,8 @@ public class ClothingPageDTO {
 
    private Double price;
 
+   private Double discountPrice;
+
    private String model;
 
    private Type type;
@@ -49,6 +51,14 @@ public class ClothingPageDTO {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Double getDiscountPrice() {
+        return discountPrice;
+    }
+
+    public void setDiscountPrice(Double discountPrice) {
+        this.discountPrice = discountPrice;
     }
 
     public String getModel() {
