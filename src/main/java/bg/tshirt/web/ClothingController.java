@@ -1,17 +1,9 @@
 package bg.tshirt.web;
 
-import bg.tshirt.database.dto.clothes.ClothEditDTO;
-import bg.tshirt.database.dto.clothes.ClothingDTO;
-import bg.tshirt.database.dto.clothes.ClothingDetailsPageDTO;
-import bg.tshirt.database.dto.clothes.ClothingPageDTO;
-import bg.tshirt.database.dto.user.UserDTO;
-import bg.tshirt.exceptions.NotFoundException;
-import bg.tshirt.service.ClothingService;
-import bg.tshirt.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import java.util.List;
+import java.util.Map;
+
+import bg.tshirt.database.dto.clothes.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import bg.tshirt.database.dto.user.UserDTO;
+import bg.tshirt.exceptions.NotFoundException;
+import bg.tshirt.service.ClothingService;
+import bg.tshirt.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/clothes")
@@ -30,10 +28,43 @@ public class ClothingController {
     private final UserService userService;
     private final ClothingService clothingService;
 
-    public ClothingController(UserService userService, ClothingService clothService) {
+    public ClothingController(UserService userService,
+                              ClothingService clothService) {
         this.userService = userService;
         this.clothingService = clothService;
     }
+
+    @GetMapping("/prices")
+    public ResponseEntity<?> getPrices() {
+        return ResponseEntity.ok(this.clothingService.getPrices());
+    }
+
+    @GetMapping("/prices-discount")
+    public ResponseEntity<?> getDiscountPrices() {
+        return ResponseEntity.ok(this.clothingService.getDiscountPrices());
+    }
+
+    @PutMapping("/prices")
+    public ResponseEntity<?> updatePrices(@RequestParam String type,
+                                          @RequestBody @Valid ClothingPriceEditDTO clothingPriceEditDTO,
+                                          HttpServletRequest request) {
+        UserDTO admin = this.userService.validateAdmin(request);
+
+        int updatedRows = this.clothingService.updatePrices(type, clothingPriceEditDTO);
+
+        if (updatedRows == 0) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "No matching clothes found to update."));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Clothes price updated successfully!",
+                "added_by", admin.getEmail(),
+                "updated_count", updatedRows
+        ));
+    }
+
 
     @PostMapping("/add")
     public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothingDTO clothDTO,
@@ -42,13 +73,13 @@ public class ClothingController {
 
         if (!this.clothingService.addClothing(clothDTO)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "Cloth with this model and type already exists."));
+                    .body(Map.of("message", "Clothing with this model and type already exists."));
         }
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "message", "Cloth added successfully!",
-                "cloth_name", clothDTO.getName(),
+                "message", "Clothing added successfully!",
+                "clothing_name", clothDTO.getName(),
                 "added_by", admin.getEmail()
         ));
     }
@@ -64,7 +95,7 @@ public class ClothingController {
         ClothingDetailsPageDTO dto = this.clothingService.findById(id);
 
         if (dto == null) {
-            throw new NotFoundException("Cloth not found in the system.");
+            throw new NotFoundException("Clothing not found in the system.");
         }
 
         return ResponseEntity.ok(Map.of(
@@ -75,7 +106,7 @@ public class ClothingController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> editClothById(@PathVariable("id") Long id,
-                                           @ModelAttribute @Valid ClothEditDTO clothDto,
+                                           @ModelAttribute @Valid ClothingEditDTO clothDto,
                                            HttpServletRequest request) {
         if (id == null || id < 1) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -86,15 +117,15 @@ public class ClothingController {
 
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothingService.editCloth(clothDto, id)) {
+        if (!this.clothingService.editClothing(clothDto, id)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", String.format("Cloth with id: %d has no images", id)));
+                    .body(Map.of("message", String.format("Clothing with id: %d has no images", id)));
         }
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "message", "Cloth edited successfully!",
-                "cloth_name", clothDto.getName(),
+                "message", "Clothing edited successfully!",
+                "clothing_name", clothDto.getName(),
                 "edited_by", admin.getEmail()
         ));
     }
@@ -113,12 +144,12 @@ public class ClothingController {
 
         if (!this.clothingService.delete(id)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", String.format("Cloth with id: %d was not found", id)));
+                    .body(Map.of("message", String.format("Clothing with id: %d was not found", id)));
         }
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "message", "Cloth with id: " + id + " was deleted successfully!",
+                "message", "Clothing with id: " + id + " was deleted successfully!",
                 "deleted_by", admin.getEmail()
         ));
     }
