@@ -23,6 +23,9 @@ public class Clothing {
     @Column(nullable = false)
     private double price;
 
+    @Column
+    private Double discountPrice;
+
     @Column(nullable = false)
     private String model;
 
@@ -84,6 +87,14 @@ public class Clothing {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public Double getDiscountPrice() {
+        return discountPrice;
+    }
+
+    public void setDiscountPrice(Double discountPrice) {
+        this.discountPrice = discountPrice;
     }
 
     public String getModel() {

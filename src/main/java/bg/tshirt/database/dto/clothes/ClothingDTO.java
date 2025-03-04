@@ -4,6 +4,7 @@ import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Type;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,9 @@ public class ClothingDTO {
     @NotBlank(message = "Model cannot be blank.")
     @Size(min = 3, max = 3, message = "Model must be exactly 3 characters")
     private String model;
+
+    @Positive
+    private double price;
 
     private MultipartFile frontImage;
 
@@ -66,6 +70,14 @@ public class ClothingDTO {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public MultipartFile getFrontImage() {
