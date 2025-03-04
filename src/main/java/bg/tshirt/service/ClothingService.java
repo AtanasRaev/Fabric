@@ -1,11 +1,9 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.clothes.ClothEditDTO;
-import bg.tshirt.database.dto.clothes.ClothingDTO;
-import bg.tshirt.database.dto.clothes.ClothingDetailsPageDTO;
-import bg.tshirt.database.dto.clothes.ClothingPageDTO;
+import bg.tshirt.database.dto.clothes.*;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.entity.enums.Category;
+import bg.tshirt.database.entity.enums.Type;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +15,7 @@ public interface ClothingService {
 
     ClothingDetailsPageDTO findById(Long id);
 
-    boolean editCloth(ClothEditDTO clothAddDTO, Long id);
+    boolean editClothing(ClothingEditDTO clothAddDTO, Long id);
 
     Page<ClothingPageDTO> findByQuery(Pageable pageable, String query);
 
@@ -36,4 +34,10 @@ public interface ClothingService {
     boolean delete(Long id);
 
     Map<Category, Long> getClothingCountByCategories(String type);
+
+    Map<Type, Double> getPrices();
+
+    int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO);
+
+    Map<Type, Double> getDiscountPrices();
 }
