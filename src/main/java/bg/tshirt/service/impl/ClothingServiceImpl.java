@@ -11,7 +11,6 @@ import bg.tshirt.exceptions.ClothingAlreadyExistsException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.ImageService;
-import bg.tshirt.service.PriceService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -26,16 +25,13 @@ import java.util.stream.Collectors;
 @Service
 public class ClothingServiceImpl implements ClothingService {
     private final ClothingRepository clothingRepository;
-    private final PriceService priceService;
     private final ImageService imageService;
     private final ModelMapper modelMapper;
 
     public ClothingServiceImpl(ClothingRepository clothRepository,
-                               PriceService priceService,
                                ImageService imageService,
                                ModelMapper modelMapper) {
         this.clothingRepository = clothRepository;
-        this.priceService = priceService;
         this.imageService = imageService;
         this.modelMapper = modelMapper;
     }
@@ -50,7 +46,7 @@ public class ClothingServiceImpl implements ClothingService {
 
         Clothing clothing = new Clothing(clothingDTO.getName(),
                 clothingDTO.getDescription(),
-                setPrice(clothingDTO.getType()),
+                clothingDTO.getPrice(),
                 clothingDTO.getModel().substring(0, 3),
                 clothingDTO.getType(),
                 clothingDTO.getCategory());
@@ -89,7 +85,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    public boolean editCloth(ClothEditDTO clothingDTO, Long id) {
+    public boolean editClothing(ClothingEditDTO clothingDTO, Long id) {
         Clothing clothing = this.clothingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Clothing with id: %d is not found", id)));
 
@@ -207,16 +203,57 @@ public class ClothingServiceImpl implements ClothingService {
         return clothingCountMap;
     }
 
+    @Override
+    public Map<Type, Double> getPrices() {
+        Map<Type, Double> defaultPrices = Map.of(
+                Type.T_SHIRT, 29.00,
+                Type.SWEATSHIRT, 54.00,
+                Type.KIT, 59.00,
+                Type.SHORTS, 30.00,
+                Type.LONG_T_SHIRT, 37.00
+        );
+
+        if (this.clothingRepository.count() == 0) {
+            return defaultPrices;
+        }
+
+        Map<Type, Double> prices = clothingRepository.findPricesForTypes(List.of(Type.values()))
+                .stream()
+                .collect(Collectors.toMap(ClothingPriceDTO::getType, ClothingPriceDTO::getPrice));
+
+        for (Type type : Type.values()) {
+            prices.putIfAbsent(type, defaultPrices.get(type));
+        }
+
+        return prices;
+    }
+
+    @Override
+    @Transactional
+    public int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO) {
+        if (clothingPriceEditDTO.getPrice() == null) {
+            return 0;
+        }
+
+        return this.clothingRepository.bulkUpdatePrices(type, clothingPriceEditDTO.getPrice(), clothingPriceEditDTO.getDiscountPrice() != null ? clothingPriceEditDTO.getDiscountPrice() : null);
+    }
+
+    @Override
+    public Map<Type, Double> getDiscountPrices() {
+        List<ClothingDiscountPriceDTO> dtoList = clothingRepository.findDiscountPricesForTypes(List.of(Type.values()));
+        Map<Type, Double> discountPrices = new HashMap<>();
+        for (ClothingDiscountPriceDTO dto : dtoList) {
+            discountPrices.put(dto.getType(), dto.getDiscountPrice());
+        }
+        return discountPrices;
+    }
+
     private List<Object[]> getCategoriesCount(String type) {
         if (StringUtils.hasText(type)) {
             return this.clothingRepository.countClothingByCategory(type);
         } else {
             return this.clothingRepository.countClothingByCategory();
         }
-    }
-
-    private Double setPrice(Type type) {
-        return this.priceService.getPriceByType(type);
     }
 
     private void addImagesToKit(ClothingPageDTO clothing, String model) {
@@ -230,7 +267,7 @@ public class ClothingServiceImpl implements ClothingService {
                 });
     }
 
-    private boolean isInvalidUpdate(ClothEditDTO clothDto, Clothing cloth) {
+    private boolean isInvalidUpdate(ClothingEditDTO clothDto, Clothing cloth) {
         boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
                 && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
         boolean removingAllImages = clothDto.getRemovedImages().size() >= cloth.getImages().size();
@@ -238,16 +275,16 @@ public class ClothingServiceImpl implements ClothingService {
         return frontAndBackImagesEmpty && removingAllImages;
     }
 
-    private void setClothDetails(Clothing cloth, ClothEditDTO clothDto) {
-        cloth.setName(clothDto.getName());
-        cloth.setDescription(clothDto.getDescription());
-        cloth.setPrice(setPrice(clothDto.getType()));
-        cloth.setModel(clothDto.getModel().substring(0, 3));
-        cloth.setType(clothDto.getType());
-        cloth.setCategory(clothDto.getCategory());
+    private void setClothDetails(Clothing clothing, ClothingEditDTO clothingEditDTO) {
+        clothing.setName(clothingEditDTO.getName());
+        clothing.setDescription(clothingEditDTO.getDescription());
+        clothing.setPrice(clothingEditDTO.getPrice());
+        clothing.setModel(clothingEditDTO.getModel().substring(0, 3));
+        clothing.setType(clothingEditDTO.getType());
+        clothing.setCategory(clothingEditDTO.getCategory());
     }
 
-    private List<Image> processImages(ClothEditDTO clothDto, Clothing cloth) {
+    private List<Image> processImages(ClothingEditDTO clothDto, Clothing cloth) {
         List<String> removedImagesPaths = clothDto.getRemovedImages();
         List<Image> imagesToSave = new ArrayList<>();
 
