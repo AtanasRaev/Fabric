@@ -7,6 +7,7 @@ import bg.tshirt.service.RefreshTokenService;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -42,7 +45,21 @@ public class UserController {
         return ResponseEntity.ok(this.userService.getUserProfile(request));
     }
 
+    @PutMapping("/edit")
+    public ResponseEntity<?> editProfile(@RequestBody @Valid UserRegistrationDTO userEditDTO, HttpServletRequest request) {
+        if (!this.userService.editUser(userEditDTO, request)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Error"));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "User edited successfully!"
+        ));
+    }
+
     @PostMapping("/register")
+
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistrationDTO registrationDTO, HttpServletRequest request) {
         this.userService.registerUser(registrationDTO);
         Authentication authentication = authenticationManager.authenticate(
