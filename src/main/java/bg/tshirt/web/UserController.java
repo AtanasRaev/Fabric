@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<?> editProfile(@RequestBody @Valid UserRegistrationDTO userEditDTO, HttpServletRequest request) {
+    public ResponseEntity<?> editProfile(@RequestBody @Valid UserEitDTO userEditDTO, HttpServletRequest request) {
         if (!this.userService.editUser(userEditDTO, request)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Error"));
@@ -59,7 +59,6 @@ public class UserController {
     }
 
     @PostMapping("/register")
-
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistrationDTO registrationDTO, HttpServletRequest request) {
         this.userService.registerUser(registrationDTO);
         Authentication authentication = authenticationManager.authenticate(

@@ -2,6 +2,7 @@ package bg.tshirt.service.impl;
 
 import bg.tshirt.config.JwtTokenProvider;
 import bg.tshirt.database.dto.user.UserDTO;
+import bg.tshirt.database.dto.user.UserEitDTO;
 import bg.tshirt.database.dto.user.UserProfileDTO;
 import bg.tshirt.database.dto.user.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
@@ -121,7 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean editUser(UserRegistrationDTO userEditDTO, HttpServletRequest request) {
+    public boolean editUser(UserEitDTO userEditDTO, HttpServletRequest request) {
         UserDTO userDTO = this.validateUser(request);
 
         Optional<User> optionalUser = this.userRepository.findByEmail(userDTO.getEmail());
@@ -135,10 +136,6 @@ public class UserServiceImpl implements UserService {
 
         if (!user.getEmail().equals(userEditDTO.getEmail()) && this.userRepository.existsByEmail(userEditDTO.getEmail())) {
             throw new EmailAlreadyInUseException("Email is already in use");
-        }
-
-        if (userEditDTO.getPassword() != null && !userEditDTO.getPassword().isBlank()) {
-            user.setPassword(this.passwordEncoder.encode(userEditDTO.getPassword()));
         }
 
         user.setFirstName(userEditDTO.getFirstName());

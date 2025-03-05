@@ -1,6 +1,7 @@
 package bg.tshirt.service;
 
 import bg.tshirt.database.dto.user.UserDTO;
+import bg.tshirt.database.dto.user.UserEitDTO;
 import bg.tshirt.database.dto.user.UserProfileDTO;
 import bg.tshirt.database.dto.user.UserRegistrationDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,5 +23,5 @@ public interface UserService {
 
     boolean resetUserPassword(UserDTO userDTO);
 
-    boolean editUser(UserRegistrationDTO userEditDTO, HttpServletRequest request);
+    boolean editUser(UserEitDTO userEditDTO, HttpServletRequest request);
 }
