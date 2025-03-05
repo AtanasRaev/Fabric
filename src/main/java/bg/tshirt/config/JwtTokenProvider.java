@@ -1,6 +1,5 @@
 package bg.tshirt.config;
 
-import bg.tshirt.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -40,12 +39,7 @@ public class JwtTokenProvider {
 
     private Key key;
 
-    private final RefreshTokenService refreshTokenService;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
-
-    public JwtTokenProvider(RefreshTokenService refreshTokenService) {
-        this.refreshTokenService = refreshTokenService;
-    }
 
     @PostConstruct
     public void init() {
