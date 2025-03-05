@@ -37,7 +37,7 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     @Query("SELECT c FROM Clothing c")
     Page<Clothing> findAllPage(Pageable pageable);
 
-    Optional<Clothing> findByModel(String model);
+    List<Clothing> findByModel(String model);
 
     @Query("SELECT c.category, COUNT(c) FROM Clothing c GROUP BY c.category")
     List<Object[]> countClothingByCategory();
