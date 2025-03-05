@@ -18,6 +18,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.email = :userEmail")
     Page<Order> findByUserId(@Param("userEmail") String userEmail, Pageable pageable);
 
-    @Query("SELECT u.id FROM User u ORDER BY u.id DESC")
-    Optional<Long> findLastId();
 }
