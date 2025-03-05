@@ -75,11 +75,7 @@ public class ClothingServiceImpl implements ClothingService {
             return clothing;
         }
 
-        String modelTshirt = clothing.getModel().substring(0, clothing.getModel().length() - 2);
-        String modelShorts = clothing.getModel().substring(0, clothing.getModel().length() - 1);
-
-        addImagesToKit(clothing, modelTshirt);
-        addImagesToKit(clothing, modelShorts);
+        addImagesToKit(clothing, clothing.getModel());
 
         return clothing;
     }
@@ -257,14 +253,40 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     private void addImagesToKit(ClothingPageDTO clothing, String model) {
-        this.clothingRepository.findByModel(model)
-                .ifPresent(foundClothing -> {
-                    List<ImagePageDTO> imageDTOs = foundClothing.getImages()
-                            .stream()
-                            .map(image -> this.modelMapper.map(image, ImagePageDTO.class))
-                            .toList();
-                    clothing.getImages().addAll(imageDTOs);
-                });
+        List<Clothing> byModel = this.clothingRepository.findByModel(model);
+        if (byModel.isEmpty()) {
+            return;
+        }
+
+        Map<Integer, ImagePageDTO> firstFront = new LinkedHashMap<>();
+        Map<Integer, ImagePageDTO> firstBack = new LinkedHashMap<>();
+        Map<Integer, ImagePageDTO> kFront = new LinkedHashMap<>();
+        Map<Integer, ImagePageDTO> kBack = new LinkedHashMap<>();
+
+        byModel.forEach(foundClothing ->
+                foundClothing.getImages().stream()
+                        .map(image -> this.modelMapper.map(image, ImagePageDTO.class))
+                        .forEach(imageDTO -> {
+                            String publicId = imageDTO.getPublicId();
+                            String numberPart = publicId.replaceAll("[^0-9]", "");
+                            int numericValue = numberPart.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(numberPart);
+
+                            if (publicId.matches("\\d+_F")) {
+                                firstFront.put(numericValue, imageDTO);
+                            } else if (publicId.matches("\\d+_B")) {
+                                firstBack.put(numericValue, imageDTO);
+                            } else if (publicId.matches("\\d+K_F") && !publicId.matches(".*KT.*")) {
+                                kFront.put(numericValue, imageDTO);
+                            } else if (publicId.matches("\\d+K_B") && !publicId.matches(".*KT.*")) {
+                                kBack.put(numericValue, imageDTO);
+                            }
+                        })
+        );
+
+        clothing.getImages().addAll(firstFront.values());
+        clothing.getImages().addAll(firstBack.values());
+        clothing.getImages().addAll(kFront.values());
+        clothing.getImages().addAll(kBack.values());
     }
 
     private boolean isInvalidUpdate(ClothingEditDTO clothDto, Clothing cloth) {
