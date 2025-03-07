@@ -3,6 +3,7 @@ package bg.tshirt.database.repository;
 import bg.tshirt.database.dto.clothes.ClothingDiscountPriceDTO;
 import bg.tshirt.database.dto.clothes.ClothingPriceDTO;
 import bg.tshirt.database.entity.Clothing;
+import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Type;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,11 +40,8 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
 
     List<Clothing> findByModel(String model);
 
-    @Query("SELECT c.category, COUNT(c) FROM Clothing c GROUP BY c.category")
-    List<Object[]> countClothingByCategory();
-
-    @Query("SELECT c.category, COUNT(c) FROM Clothing c WHERE LOWER(c.type) LIKE LOWER(:type) GROUP BY c.category")
-    List<Object[]> countClothingByCategory(String type);
+    @Query("SELECT c.category FROM Clothing c WHERE LOWER(c.type) LIKE LOWER(:type) GROUP BY c.category")
+    List<Category> countClothingByCategory(String type);
 
     @Query("SELECT new bg.tshirt.database.dto.clothes.ClothingPriceDTO(c.type, c.price) " +
             "FROM Clothing c " +
