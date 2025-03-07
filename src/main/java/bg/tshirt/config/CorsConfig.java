@@ -16,6 +16,7 @@ public class CorsConfig {
         config.setAllowedOriginPatterns(List.of(
                 "https://clothing-website-1.web.app",
                 "https://fabric-clothes.web.app",
+                "https://fabric-six.vercel.app",
                 "http://localhost:*"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
