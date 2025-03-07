@@ -277,6 +277,8 @@ public class OrderServiceImpl implements OrderService {
             case KIT -> name = "Комплект";
             case LONG_T_SHIRT -> name = "Блуза с дълъг ръкав";
             case SWEATSHIRT -> name = "Суитчър";
+            case TOWELS -> name = "Плажна кърпа";
+            case BANDANAS -> name = "Бандана";
             default -> name = "Къси панталони";
         }
         return name;
