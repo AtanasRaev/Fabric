@@ -186,17 +186,8 @@ public class ClothingServiceImpl implements ClothingService {
 
 
     @Override
-    public Map<Category, Long> getClothingCountByCategories(String type) {
-        List<Object[]> results = getCategoriesCount(type);
-        Map<Category, Long> clothingCountMap = new HashMap<>();
-
-        results.forEach(object -> {
-            Category category = (Category) object[0];
-            Long count = (Long) object[1];
-            clothingCountMap.put(category, count);
-        });
-
-        return clothingCountMap;
+    public List<Category> getClothingCountByCategories(String type) {
+        return this.clothingRepository.countClothingByCategory(type);
     }
 
     @Override
@@ -242,14 +233,6 @@ public class ClothingServiceImpl implements ClothingService {
             discountPrices.put(dto.getType(), dto.getDiscountPrice());
         }
         return discountPrices;
-    }
-
-    private List<Object[]> getCategoriesCount(String type) {
-        if (StringUtils.hasText(type)) {
-            return this.clothingRepository.countClothingByCategory(type);
-        } else {
-            return this.clothingRepository.countClothingByCategory();
-        }
     }
 
     private void addImagesToKit(ClothingPageDTO clothing, String model) {
