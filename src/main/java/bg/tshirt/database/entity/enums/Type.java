@@ -5,5 +5,7 @@ public enum Type {
     SHORTS,
     SWEATSHIRT,
     LONG_T_SHIRT,
-    KIT
+    KIT,
+    TOWELS,
+    BANDANAS
 }
