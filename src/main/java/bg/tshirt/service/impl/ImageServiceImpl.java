@@ -108,6 +108,12 @@ public class ImageServiceImpl implements ImageService {
             case KIT -> {
                 return "KT";
             }
+            case TOWELS -> {
+                return "T";
+            }
+            case BANDANAS -> {
+                return "B";
+            }
             default -> {
                 return "";
             }
