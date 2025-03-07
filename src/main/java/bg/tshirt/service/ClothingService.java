@@ -33,7 +33,7 @@ public interface ClothingService {
 
     boolean delete(Long id);
 
-    Map<Category, Long> getClothingCountByCategories(String type);
+    List<Category> getClothingCountByCategories(String type);
 
     Map<Type, Double> getPrices();
 
