@@ -188,7 +188,7 @@ public class ClothingController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<?> getCategories(@RequestParam(required = false) String type) {
+    public ResponseEntity<?> getCategories(@RequestParam String type) {
         return ResponseEntity.ok(this.clothingService.getClothingCountByCategories(type));
     }
 
