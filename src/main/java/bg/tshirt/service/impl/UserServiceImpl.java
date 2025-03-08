@@ -1,10 +1,13 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.config.JwtTokenProvider;
+import bg.tshirt.database.dto.clothes.ClothingPageDTO;
+import bg.tshirt.database.dto.clothes.ClothingWishlistDTO;
 import bg.tshirt.database.dto.user.UserDTO;
 import bg.tshirt.database.dto.user.UserEitDTO;
 import bg.tshirt.database.dto.user.UserProfileDTO;
 import bg.tshirt.database.dto.user.UserRegistrationDTO;
+import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.User;
 import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.database.repository.UserRepository;
@@ -12,13 +15,14 @@ import bg.tshirt.exceptions.EmailAlreadyInUseException;
 import bg.tshirt.exceptions.ForbiddenException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.exceptions.UnauthorizedException;
+import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.UserService;
 import bg.tshirt.utils.PhoneNumberUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final PhoneNumberUtils phoneNumberUtils;
+    private final ClothingService clothingService;
     private final static int ADMINS_COUNT = 4;
     private static final int MODERATOR_COUNT = 4;
 
@@ -39,12 +44,14 @@ public class UserServiceImpl implements UserService {
                            JwtTokenProvider jwtTokenProvider,
                            PasswordEncoder passwordEncoder,
                            ModelMapper modelMapper,
-                           PhoneNumberUtils phoneNumberUtils) {
+                           PhoneNumberUtils phoneNumberUtils,
+                           ClothingService clothingService) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.phoneNumberUtils = phoneNumberUtils;
+        this.clothingService = clothingService;
     }
 
     @Override
@@ -150,6 +157,69 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @Transactional
+    @Override
+    public boolean addToWishList(ClothingPageDTO clothingPageDTO, HttpServletRequest request) {
+        User user = getUser(request);
+        Clothing clothingEntityById = this.clothingService.getClothingEntityById(clothingPageDTO.getId());
+        if (clothingEntityById == null) {
+            return false;
+        }
+
+        List<Clothing> list = user.getFavorites()
+                .stream()
+                .filter(c -> c.getId() == clothingPageDTO.getId())
+                .toList();
+
+        if (list.isEmpty()) {
+            user.addFavorite(clothingEntityById);
+            this.userRepository.save(user);
+        }
+
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public List<ClothingWishlistDTO> getFavorites(HttpServletRequest request) {
+        User user = getUser(request);
+
+        return user.getFavorites()
+                .stream()
+                .map(c -> {
+                    ClothingWishlistDTO dto = this.modelMapper.map(c, ClothingWishlistDTO.class);
+                    if (c.getDiscountPrice() != null) {
+                        dto.setPrice(c.getDiscountPrice());
+                    }
+
+                    c.getImages().forEach(i -> {
+                        if (i.getPublicId().contains("_F")) {
+                            dto.setImage(i.getPath());
+                        }
+                    });
+
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void removeFromWishlist(Long clothingId, HttpServletRequest request) {
+        User user = getUser(request);
+        user.removeFavorite(clothingId);
+    }
+
+    private User getUser(HttpServletRequest request) {
+        UserDTO userDTO = validateUser(request);
+        Optional<User> optional = this.userRepository.findByEmail(userDTO.getEmail());
+
+        if (optional.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+
+        return optional.get();
+    }
 
     private void saveUser(User user) {
         this.userRepository.save(user);

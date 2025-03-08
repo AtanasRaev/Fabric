@@ -1,5 +1,7 @@
 package bg.tshirt.service;
 
+import bg.tshirt.database.dto.clothes.ClothingPageDTO;
+import bg.tshirt.database.dto.clothes.ClothingWishlistDTO;
 import bg.tshirt.database.dto.user.UserDTO;
 import bg.tshirt.database.dto.user.UserEitDTO;
 import bg.tshirt.database.dto.user.UserProfileDTO;
@@ -24,4 +26,10 @@ public interface UserService {
     boolean resetUserPassword(UserDTO userDTO);
 
     boolean editUser(UserEitDTO userEditDTO, HttpServletRequest request);
+
+    boolean addToWishList(ClothingPageDTO clothingPageDTO, HttpServletRequest request);
+
+    List<ClothingWishlistDTO> getFavorites(HttpServletRequest request);
+
+    void removeFromWishlist(Long clothingId, HttpServletRequest request);
 }
