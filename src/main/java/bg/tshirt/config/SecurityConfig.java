@@ -53,6 +53,8 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.POST, "/clothes/**").authenticated()
                             .requestMatchers(
                                     "/users/profile",
+                                    "/users/wishlist",
+                                    "/users/wishlist/**",
                                     "/clothes/add",
                                     "/orders/list"
                             ).authenticated()
