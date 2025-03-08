@@ -1,6 +1,7 @@
 package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
+import bg.tshirt.database.dto.clothes.ClothingPageDTO;
 import bg.tshirt.database.dto.user.*;
 import bg.tshirt.service.PasswordResetService;
 import bg.tshirt.service.RefreshTokenService;
@@ -119,5 +120,28 @@ public class UserController {
         }
         boolean reset = this.passwordResetService.resetPassword(resetPasswordDTO.getToken(), resetPasswordDTO.getPassword());
         return reset ? ResponseEntity.ok("Your password has been updated successfully.") : ResponseEntity.badRequest().body("Password reset failed.");
+    }
+
+    @PutMapping("/wishlist")
+    public ResponseEntity<?> addToWishlist(@RequestBody @Valid ClothingPageDTO clothingPageDTO,
+                                           HttpServletRequest request) {
+        if (!this.userService.addToWishList(clothingPageDTO, request)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Clothing item not found"));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Item successfully added to wishlist"));
+    }
+
+    @GetMapping("/wishlist")
+    public ResponseEntity<?> getWishlist(HttpServletRequest request) {
+        return ResponseEntity.ok(this.userService.getFavorites(request));
+    }
+
+    @PutMapping("/wishlist/{id}")
+    public ResponseEntity<?> removeFromWishlist(@PathVariable Long id,
+                                                HttpServletRequest request) {
+        this.userService.removeFromWishlist(id, request);
+        return ResponseEntity.ok(Map.of("message", "Item successfully removed from wishlist"));
     }
 }
