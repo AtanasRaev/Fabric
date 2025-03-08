@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
-public class ClothingDTO {
+public class ClothingValidationDTO {
     @NotBlank(message = "Name cannot be blank.")
     private String name;
 
