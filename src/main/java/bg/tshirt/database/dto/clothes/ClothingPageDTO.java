@@ -4,38 +4,14 @@ import bg.tshirt.database.entity.enums.Type;
 
 import java.util.List;
 
-public class ClothingPageDTO {
-   private Long id;
+public class ClothingPageDTO extends ClothingBaseDTO {
+    private String description;
 
-   private String name;
+    private Double discountPrice;
 
-   private String description;
-
-   private Double price;
-
-   private Double discountPrice;
-
-   private String model;
-
-   private Type type;
+    private Type type;
 
    private List<ImagePageDTO> images;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getDescription() {
         return description;
@@ -45,28 +21,12 @@ public class ClothingPageDTO {
         this.description = description;
     }
 
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
     public Double getDiscountPrice() {
         return discountPrice;
     }
 
     public void setDiscountPrice(Double discountPrice) {
         this.discountPrice = discountPrice;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
     }
 
     public Type getType() {
