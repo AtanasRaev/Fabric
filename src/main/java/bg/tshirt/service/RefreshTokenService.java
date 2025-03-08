@@ -8,5 +8,4 @@ public interface RefreshTokenService {
     boolean isValid(String tokenId);
 
     void revokeToken(String tokenId);
-
 }

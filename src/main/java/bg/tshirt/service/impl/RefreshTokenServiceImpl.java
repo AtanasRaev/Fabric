@@ -5,6 +5,7 @@ import bg.tshirt.database.repository.RefreshTokenRepository;
 import bg.tshirt.service.RefreshTokenService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -42,7 +43,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Scheduled(cron = "0 * * * *")
-    private void cleanupExpiredTokens() {
+    @Transactional
+    protected void cleanupExpiredTokens() {
         this.refreshTokenRepository.deleteByExpiryDateBefore(Instant.now());
     }
 }
