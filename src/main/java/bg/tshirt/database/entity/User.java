@@ -45,6 +45,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
+    @ManyToMany
+    private List<Clothing> favorites = new ArrayList<>();
+
     public User() {
     }
 
@@ -154,5 +157,21 @@ public class User {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public List<Clothing> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(List<Clothing> favorites) {
+        this.favorites = favorites;
+    }
+
+    public void addFavorite(Clothing clothing) {
+        this.favorites.add(clothing);
+    }
+
+    public void removeFavorite(Long clothingId) {
+        getFavorites().removeIf(clothing -> clothing.getId() == clothingId);
     }
 }
