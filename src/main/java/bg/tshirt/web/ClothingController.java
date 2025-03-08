@@ -67,7 +67,7 @@ public class ClothingController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothingDTO clothDTO,
+    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothingValidationDTO clothDTO,
                                       HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
@@ -106,7 +106,7 @@ public class ClothingController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> editClothById(@PathVariable("id") Long id,
-                                           @ModelAttribute @Valid ClothingEditDTO clothDto,
+                                           @ModelAttribute @Valid ClothingEditValidationDTO clothDto,
                                            HttpServletRequest request) {
         if (id == null || id < 1) {
             return ResponseEntity.badRequest().body(Map.of(

@@ -3,10 +3,10 @@ package bg.tshirt.database.dto.clothes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClothingEditDTO extends ClothingDTO {
+public class ClothingEditValidationDTO extends ClothingValidationDTO {
     private List<String> removedImages;
 
-    public ClothingEditDTO() {
+    public ClothingEditValidationDTO() {
         this.removedImages = new ArrayList<>();
     }
 

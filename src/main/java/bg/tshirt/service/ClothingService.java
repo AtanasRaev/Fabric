@@ -1,6 +1,7 @@
 package bg.tshirt.service;
 
 import bg.tshirt.database.dto.clothes.*;
+import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Type;
@@ -11,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 public interface ClothingService {
-    boolean addClothing(ClothingDTO clothAddDTO);
+    boolean addClothing(ClothingValidationDTO clothAddDTO);
 
     ClothingDetailsPageDTO findById(Long id);
 
-    boolean editClothing(ClothingEditDTO clothAddDTO, Long id);
+    Clothing getClothingEntityById(Long id);
+
+    boolean editClothing(ClothingEditValidationDTO clothAddDTO, Long id);
 
     Page<ClothingPageDTO> findByQuery(Pageable pageable, String query);
 

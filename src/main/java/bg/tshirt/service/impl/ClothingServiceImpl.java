@@ -16,7 +16,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,7 +36,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    public boolean addClothing(ClothingDTO clothingDTO) {
+    public boolean addClothing(ClothingValidationDTO clothingDTO) {
         Optional<Clothing> optional = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
 
         if (optional.isPresent()) {
@@ -81,7 +80,13 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    public boolean editClothing(ClothingEditDTO clothingDTO, Long id) {
+    public Clothing getClothingEntityById(Long id) {
+        return this.clothingRepository.findById(id)
+                .orElse(null);
+    }
+
+    @Override
+    public boolean editClothing(ClothingEditValidationDTO clothingDTO, Long id) {
         Clothing clothing = this.clothingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Clothing with id: %d is not found", id)));
 
@@ -272,7 +277,7 @@ public class ClothingServiceImpl implements ClothingService {
         clothing.getImages().addAll(kBack.values());
     }
 
-    private boolean isInvalidUpdate(ClothingEditDTO clothDto, Clothing cloth) {
+    private boolean isInvalidUpdate(ClothingEditValidationDTO clothDto, Clothing cloth) {
         boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
                 && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
         boolean removingAllImages = clothDto.getRemovedImages().size() >= cloth.getImages().size();
@@ -280,7 +285,7 @@ public class ClothingServiceImpl implements ClothingService {
         return frontAndBackImagesEmpty && removingAllImages;
     }
 
-    private void setClothDetails(Clothing clothing, ClothingEditDTO clothingEditDTO) {
+    private void setClothDetails(Clothing clothing, ClothingEditValidationDTO clothingEditDTO) {
         clothing.setName(clothingEditDTO.getName());
         clothing.setDescription(clothingEditDTO.getDescription());
         clothing.setPrice(clothingEditDTO.getPrice());
@@ -289,7 +294,7 @@ public class ClothingServiceImpl implements ClothingService {
         clothing.setCategory(clothingEditDTO.getCategory());
     }
 
-    private List<Image> processImages(ClothingEditDTO clothDto, Clothing cloth) {
+    private List<Image> processImages(ClothingEditValidationDTO clothDto, Clothing cloth) {
         List<String> removedImagesPaths = clothDto.getRemovedImages();
         List<Image> imagesToSave = new ArrayList<>();
 
@@ -324,7 +329,7 @@ public class ClothingServiceImpl implements ClothingService {
         });
     }
 
-    private void addNewImages(ClothingDTO clothDto, Clothing cloth, List<Image> imagesToSave) {
+    private void addNewImages(ClothingValidationDTO clothDto, Clothing cloth, List<Image> imagesToSave) {
         if (clothDto.getFrontImage() != null && !clothDto.getFrontImage().isEmpty()) {
             Image frontImage = this.imageService.saveImageInCloud(clothDto.getFrontImage(), cloth, "F");
             imagesToSave.add(frontImage);
