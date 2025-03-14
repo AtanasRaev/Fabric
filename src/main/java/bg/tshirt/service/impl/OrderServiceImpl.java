@@ -13,6 +13,7 @@ import bg.tshirt.database.entity.User;
 import bg.tshirt.database.repository.ClothingRepository;
 import bg.tshirt.database.repository.OrderRepository;
 import bg.tshirt.database.repository.UserRepository;
+import bg.tshirt.exceptions.BadRequestException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.EmailService;
@@ -60,6 +61,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void createOrder(OrderDTO orderDTO, UserDTO userDTO) {
+        if (orderDTO == null) {
+            throw new BadRequestException("Order data is invalid: order cannot be null");
+        }
+
         User user = validateUser(userDTO);
         Order order = buildOrder(orderDTO, user);
 
@@ -72,6 +77,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void createOrder(OrderDTO orderDTO) {
+        if (orderDTO == null) {
+            throw new BadRequestException("Order data is invalid: order cannot be null");
+        }
+
         Optional<User> optional = this.userRepository.findByEmail(orderDTO.getEmail());
         User user = null;
 
