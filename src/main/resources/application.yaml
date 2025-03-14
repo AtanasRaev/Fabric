@@ -2,7 +2,7 @@ spring:
   task:
     scheduling:
       pool:
-        size: 10
+        size: 2
   jpa:
     properties:
       hibernate:
@@ -24,7 +24,9 @@ spring:
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      max-lifetime: 1000000
+      maximum-pool-size: 5
+      max-lifetime: 840000
+      idle-timeout: 300000
       connection-test-query: SELECT 1
   servlet:
     multipart:
