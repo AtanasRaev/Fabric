@@ -42,7 +42,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         });
     }
 
-    @Scheduled(cron = "0 * * * *")
+    @Scheduled(cron = "0 0 */5 * * ?")
     @Transactional
     protected void cleanupExpiredTokens() {
         this.refreshTokenRepository.deleteByExpiryDateBefore(Instant.now());
