@@ -198,7 +198,7 @@ public class ClothingServiceImpl implements ClothingService {
     @Override
     public Map<Type, Double> getPrices() {
         Map<Type, Double> defaultPrices = Map.of(
-                Type.T_SHIRT, 29.00,
+                Type.T_SHIRT, 37.99,
                 Type.SWEATSHIRT, 54.00,
                 Type.KIT, 59.00,
                 Type.SHORTS, 30.00,
