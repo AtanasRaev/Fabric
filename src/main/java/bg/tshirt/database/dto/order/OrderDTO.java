@@ -1,6 +1,8 @@
 package bg.tshirt.database.dto.order;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
@@ -32,6 +34,8 @@ public class OrderDTO {
 
     private Double finalPrice;
 
+    @NotNull(message = "Cart cannot be null")
+    @NotEmpty(message = "Cart cannot be empty")
     private List<OrderItemDTO> cart;
 
     public String getFirstName() {
