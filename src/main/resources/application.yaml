@@ -23,6 +23,9 @@ spring:
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      max-lifetime: 1000000
+      connection-test-query: SELECT 1
   servlet:
     multipart:
       max-file-size: 10MB
@@ -58,3 +61,5 @@ mailjet:
     key: ${MAILJET_API_KEY}
     secret: ${MAILJET_API_SECRET}
     sender: ${SENDER_EMAIL}
+server:
+  port: ${PORT:8080}
