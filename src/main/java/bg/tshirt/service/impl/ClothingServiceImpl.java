@@ -50,6 +50,11 @@ public class ClothingServiceImpl implements ClothingService {
                 clothingDTO.getType(),
                 clothingDTO.getCategory());
 
+        Double discountPriceByType = this.clothingRepository.findDiscountPriceByType(clothingDTO.getType());
+        if (discountPriceByType != null) {
+            clothing.setDiscountPrice(discountPriceByType);
+        }
+
         List<Image> images = new ArrayList<>();
         addNewImages(clothingDTO, clothing, images);
         clothing.setImages(images);
