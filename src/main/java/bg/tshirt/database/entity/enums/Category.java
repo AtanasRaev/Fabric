@@ -17,6 +17,9 @@ public enum Category {
     HUNTING,
     FISHING,
     FORMULA_1,
-    WORK
+    WORK,
+    NBA,
+    GYM,
+    ABSTRACT
 }
 
