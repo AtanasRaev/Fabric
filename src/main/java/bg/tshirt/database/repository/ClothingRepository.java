@@ -61,6 +61,6 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     @Query("UPDATE Clothing c SET c.price = :price, c.discountPrice = :discountPrice WHERE LOWER(c.type) LIKE LOWER(:type)")
     int bulkUpdatePrices(@Param("type") String type, @Param("price") double price, @Param("discountPrice") Double discountPrice);
 
-    @Query("SELECT c.discountPrice FROM Clothing c WHERE LOWER(c.type) LIKE LOWER(:type)")
+    @Query("SELECT MIN(c.discountPrice) FROM Clothing c WHERE c.type = :type")
     Double findDiscountPriceByType(Type type);
 }
