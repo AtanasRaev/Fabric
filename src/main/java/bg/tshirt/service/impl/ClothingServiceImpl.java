@@ -202,7 +202,9 @@ public class ClothingServiceImpl implements ClothingService {
                 Type.SWEATSHIRT, 54.00,
                 Type.KIT, 59.00,
                 Type.SHORTS, 30.00,
-                Type.LONG_T_SHIRT, 37.00
+                Type.LONG_T_SHIRT, 37.00,
+                Type.TOWELS, 24.00,
+                Type.BANDANAS, 12.00
         );
 
         if (this.clothingRepository.count() == 0) {
