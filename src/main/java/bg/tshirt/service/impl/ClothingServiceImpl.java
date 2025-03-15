@@ -30,10 +30,10 @@ public class ClothingServiceImpl implements ClothingService {
     private final ImageService imageService;
     private final ModelMapper modelMapper;
 
-    public ClothingServiceImpl(ClothingRepository clothRepository,
+    public ClothingServiceImpl(ClothingRepository clothingRepository,
                                ImageService imageService,
                                ModelMapper modelMapper) {
-        this.clothingRepository = clothRepository;
+        this.clothingRepository = clothingRepository;
         this.imageService = imageService;
         this.modelMapper = modelMapper;
     }
@@ -127,33 +127,53 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    @Cacheable(value = "clothingQuery", key = "#query + '_' + #pageable.pageNumber")
+    @Cacheable(
+            value = "clothingQuery",
+            key = "'findByQuery_' + #query + '_' + #pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()"
+    )
     public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query) {
         return this.clothingRepository.findByQuery(pageable, "%" + query + "%")
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
     @Override
+    @Cacheable(
+            value = "clothingQuery",
+            key = "'findByQueryWithType_' + #query + '_' + #type + '_' + #pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()"
+    )
     public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query, List<String> type) {
-        return this.clothingRepository.findByQueryAndType(pageable, "%" + query + "%", type.stream().map(String::toLowerCase).toList())
+        List<String> lowerTypes = type.stream().map(String::toLowerCase).collect(Collectors.toList());
+        return this.clothingRepository.findByQueryAndType(pageable, "%" + query + "%", lowerTypes)
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothingPageDTO> findByCategory(Pageable pageable, List<String> category) {
-        return this.clothingRepository.findByCategory(pageable, category.stream().map(String::toLowerCase).toList())
+    @Cacheable(
+            value = "clothingQuery",
+            key = "'findByCategory_' + #category + '_' + #pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()"
+    )
+    public Page<ClothingPageDTO> findByCategory(Pageable pageable, String category) {
+        return this.clothingRepository.findByCategory(pageable, category)
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
     @Override
+    @Cacheable(
+            value = "clothingQuery",
+            key = "'findByType_' + #type + '_' + #pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()"
+    )
     public Page<ClothingPageDTO> findByType(Pageable pageable, String type) {
         return this.clothingRepository.findByType(pageable, type)
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, List<String> category) {
-        return this.clothingRepository.findByTypeAndCategory(pageable, type, category.stream().map(String::toLowerCase).toList())
+    @Cacheable(
+            value = "clothingQuery",
+            key = "'findByTypeAndCategory_' + #type + '_' + #category + '_' + #pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()"
+    )
+    public Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category) {
+        return this.clothingRepository.findByTypeAndCategory(pageable, type, category)
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
@@ -178,6 +198,10 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @Cacheable(
+            value = "clothingQuery",
+            key = "'getAllPage_' + #pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()"
+    )
     public Page<ClothingPageDTO> getAllPage(Pageable pageable) {
         return this.clothingRepository.findAllPage(pageable)
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
@@ -241,12 +265,12 @@ public class ClothingServiceImpl implements ClothingService {
         return prices;
     }
 
+    @Transactional
     @Override
     @Caching(evict = {
             @CacheEvict(value = "clothing", allEntries = true),
             @CacheEvict(value = "clothingQuery", allEntries = true)
     })
-    @Transactional
     public int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO) {
         if (clothingPriceEditDTO.getPrice() == null) {
             return 0;
