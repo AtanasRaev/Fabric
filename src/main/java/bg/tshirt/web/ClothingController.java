@@ -177,7 +177,7 @@ public class ClothingController {
     @GetMapping("/catalog")
     public ResponseEntity<?> getCatalog(@RequestParam(defaultValue = "most-sold") String sort,
                                         @RequestParam(required = false) String type,
-                                        @RequestParam(required = false) List<String> category,
+                                        @RequestParam(required = false) String category,
                                         @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
                                         @RequestParam(defaultValue = "1") @Min(1) int page) {
 
@@ -226,7 +226,7 @@ public class ClothingController {
         return PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
     }
 
-    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, List<String> category) {
+    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, String category) {
         if (StringUtils.hasText(type) && category != null && !category.isEmpty()) {
             return this.clothingService.findByTypeAndCategory(pageable, type, category);
         } else if (StringUtils.hasText(type)) {
