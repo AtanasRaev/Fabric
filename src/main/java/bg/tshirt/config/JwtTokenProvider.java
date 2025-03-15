@@ -146,13 +146,12 @@ public class JwtTokenProvider {
 
     public String generateDeviceFingerprint(HttpServletRequest request) {
         String userAgent = Optional.ofNullable(request.getHeader("User-Agent")).orElse("Unknown UserAgent");
-        String screenResolution = Optional.ofNullable(request.getHeader("screenResolution")).orElse("Unknown Resolution");
         String timezone = Optional.ofNullable(request.getHeader("timezone")).orElse("Unknown Timezone");
         String language = Optional.ofNullable(request.getHeader("Accept-Language")).orElse("Unknown Language");
         String hardwareConcurrency = Optional.ofNullable(request.getHeader("hardwareConcurrency")).orElse("Unknown Hardware");
         String deviceMemory = Optional.ofNullable(request.getHeader("deviceMemory")).orElse("Unknown Memory");
 
-        String fingerprint = userAgent + screenResolution + timezone + language + hardwareConcurrency + deviceMemory;
+        String fingerprint = userAgent + timezone + language + hardwareConcurrency + deviceMemory;
         return hashFunction(fingerprint);
     }
 
