@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @CacheEvict(value = "clothingQuery", allEntries = true)
     public boolean addClothing(ClothingValidationDTO clothingDTO) {
         Optional<Clothing> optional = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
 
@@ -94,7 +96,10 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    @CacheEvict(value = "clothing", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "clothing", key = "#id"),
+            @CacheEvict(value = "clothingQuery", allEntries = true)
+    })
     public boolean editClothing(ClothingEditValidationDTO clothingDTO, Long id) {
         Clothing clothing = this.clothingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Clothing with id: %d is not found", id)));
@@ -180,7 +185,10 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "clothing", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "clothing", key = "#id"),
+            @CacheEvict(value = "clothingQuery", allEntries = true)
+    })
     public boolean delete(Long id) {
         Optional<Clothing> optional = this.clothingRepository.findById(id);
         if (optional.isEmpty()) {
@@ -234,7 +242,10 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    @CacheEvict(value = "clothingPrices", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "clothing", allEntries = true),
+            @CacheEvict(value = "clothingQuery", allEntries = true)
+    })
     @Transactional
     public int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO) {
         if (clothingPriceEditDTO.getPrice() == null) {

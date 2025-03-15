@@ -16,6 +16,17 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
+
+        CaffeineCache clothingCache = new CaffeineCache("clothing",
+                Caffeine.newBuilder()
+                        .maximumSize(100)
+                        .build());
+
+        CaffeineCache clothingQueryCache = new CaffeineCache("clothingQuery",
+                Caffeine.newBuilder()
+                        .maximumSize(100)
+                        .build());
+
         CaffeineCache econtCitiesCache = new CaffeineCache("econtCities",
                 Caffeine.newBuilder()
                         .expireAfterWrite(30, TimeUnit.DAYS)
@@ -28,7 +39,7 @@ public class CacheConfig {
                         .maximumSize(100)
                         .build());
 
-        cacheManager.setCaches(List.of(econtCitiesCache, econtOfficesCache));
+        cacheManager.setCaches(List.of(clothingCache, clothingQueryCache, econtCitiesCache, econtOfficesCache));
         return cacheManager;
     }
 }
