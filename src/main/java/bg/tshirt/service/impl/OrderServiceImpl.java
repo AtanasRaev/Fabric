@@ -21,6 +21,9 @@ import bg.tshirt.service.OrderService;
 import bg.tshirt.utils.PhoneNumberUtils;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -54,12 +57,12 @@ public class OrderServiceImpl implements OrderService {
         this.clothingService = clothingService;
         this.emailService = emailService;
         this.phoneNumberUtils = phoneNumberUtils;
-
         this.modelMapper = modelMapper;
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "orders", allEntries = true)
     public void createOrder(OrderDTO orderDTO, UserDTO userDTO) {
         if (orderDTO == null) {
             throw new BadRequestException("Order data is invalid: order cannot be null");
@@ -76,17 +79,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = "orders", allEntries = true)
     public void createOrder(OrderDTO orderDTO) {
         if (orderDTO == null) {
             throw new BadRequestException("Order data is invalid: order cannot be null");
         }
 
         Optional<User> optional = this.userRepository.findByEmail(orderDTO.getEmail());
-        User user = null;
-
-        if (optional.isPresent()) {
-            user = optional.get();
-        }
+        User user = optional.orElse(null);
         Order order = buildOrder(orderDTO, user);
 
         this.orderRepository.save(order);
@@ -95,51 +96,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderPageDTO> getAllOrdersByStatus(Pageable pageable, String status) {
-        return this.orderRepository.findAllByStatus(pageable, status)
-                .map(order -> {
-                    OrderPageDTO map = this.modelMapper.map(order, OrderPageDTO.class);
-                    map.setQuantity(order.getItems().stream().mapToInt(OrderItem::getQuantity).sum());
-                    map.setCustomer(order.getFirstName() + " " + order.getLastName());
-                    return map;
-                });
-    }
-
-    @Override
-    public Page<OrderPageDTO> getAllOrders(Pageable pageable) {
-        return this.orderRepository.findAll(pageable)
-                .map(order -> {
-                    OrderPageDTO map = this.modelMapper.map(order, OrderPageDTO.class);
-                    map.setQuantity(order.getItems().stream().mapToInt(OrderItem::getQuantity).sum());
-                    map.setCustomer(order.getFirstName() + " " + order.getLastName());
-                    return map;
-                });
-    }
-
-    @Override
-    public OrdersDetailsDTO findOrderById(Long id) {
-        return this.orderRepository.findById(id)
-                .map(order -> {
-                    OrdersDetailsDTO map = this.modelMapper.map(order, OrdersDetailsDTO.class);
-                    map.setCustomer(order.getFirstName() + " " + order.getLastName());
-                    map.setItems(map.getItems().stream()
-                            .peek(itemDTO -> {
-                                ClothingDetailsPageDTO byId = this.clothingService.findById(itemDTO.getClothingId());
-                                if (byId == null) {
-                                    throw new NotFoundException("Clothing with id " + itemDTO.getClothingId() + " not found");
-                                }
-
-                                itemDTO.setName(getTypeOnBulgarian(byId) + " " + byId.getName());
-                                itemDTO.setModel(byId.getModel());
-
-                            }).toList());
-
-                    return map;
-                })
-                .orElse(null);
-    }
-
-    @Override
+    @Transactional
+    @CacheEvict(value = "orders", allEntries = true)
     public boolean updateStatus(Long id, String status) {
         Optional<Order> byId = this.orderRepository.findById(id);
 
@@ -163,28 +121,51 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderPageDTO> findOrdersByUser(String userEmail, Pageable pageable) {
-        return this.orderRepository.findByUserId(userEmail, pageable)
+    @Cacheable(value = "orders", key = "'findOrderById_' + #id")
+    public OrdersDetailsDTO findOrderById(Long id) {
+        return this.orderRepository.findById(id)
                 .map(order -> {
-                    OrderPageDTO map = this.modelMapper.map(order, OrderPageDTO.class);
-                    map.setQuantity(order.getItems().stream().mapToInt(OrderItem::getQuantity).sum());
-                    map.setCustomer(order.getFirstName() + " " + order.getLastName());
-                    return map;
-                });
+                    OrdersDetailsDTO dto = this.modelMapper.map(order, OrdersDetailsDTO.class);
+                    dto.setCustomer(order.getFirstName() + " " + order.getLastName());
+                    dto.setItems(
+                            dto.getItems().stream().peek(itemDTO -> {
+                                ClothingDetailsPageDTO clothing = this.clothingService.findById(itemDTO.getClothingId());
+                                if (clothing == null) {
+                                    throw new NotFoundException("Clothing with id " + itemDTO.getClothingId() + " not found");
+                                }
+                                itemDTO.setName(getTypeOnBulgarian(clothing) + " " + clothing.getName());
+                                itemDTO.setModel(clothing.getModel());
+                            }).collect(Collectors.toList())
+                    );
+                    return dto;
+                })
+                .orElse(null);
+    }
+
+    @Override
+    @Cacheable(value = "orders", key = "'getAllOrdersByStatus_' + #status + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
+    public Page<OrderPageDTO> getAllOrdersByStatus(Pageable pageable, String status) {
+        return this.orderRepository.findAllByStatusDto(status, pageable);
+    }
+
+    @Override
+    @Cacheable(value = "orders", key = "'getAllOrders_' + #pageable.pageNumber + '_' + #pageable.pageSize")
+    public Page<OrderPageDTO> getAllOrders(Pageable pageable) {
+        return this.orderRepository.findAllOrderPageDTO(pageable);
+    }
+
+    @Override
+    @Cacheable(value = "orders", key = "'findOrdersByUser_' + #userEmail + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
+    public Page<OrderPageDTO> findOrdersByUser(String userEmail, Pageable pageable) {
+        return this.orderRepository.findOrdersByUserDto(userEmail, pageable);
     }
 
     private String setStatus(String status) {
-        switch (status.toLowerCase()) {
-            case "confirm" -> {
-                return "Confirmed";
-            }
-            case "reject" -> {
-                return "Rejected";
-            }
-            default -> {
-                return "Pending";
-            }
-        }
+        return switch (status.toLowerCase()) {
+            case "confirm" -> "Confirmed";
+            case "reject" -> "Rejected";
+            default -> "Pending";
+        };
     }
 
     private User validateUser(UserDTO userDTO) {
