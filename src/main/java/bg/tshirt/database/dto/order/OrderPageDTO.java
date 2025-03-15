@@ -35,6 +35,15 @@ public class OrderPageDTO {
     public OrderPageDTO() {
     }
 
+    public OrderPageDTO(Long id, String firstName, String lastName, String status, double totalPrice, Long quantity, Instant createdAt) {
+        this.id = id;
+        this.customer = firstName + " " + lastName;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.quantity = quantity.intValue();
+        this.createdAt = createdAt;
+    }
+
     public Long getId() {
         return id;
     }
