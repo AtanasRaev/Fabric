@@ -24,11 +24,11 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> findByQuery(Pageable pageable, String query, List<String> type);
 
-    Page<ClothingPageDTO> findByCategory(Pageable pageable, List<String> category);
+    Page<ClothingPageDTO> findByCategory(Pageable pageable, String category);
 
     Page<ClothingPageDTO> findByType(Pageable pageable, String type);
 
-    Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, List<String> category);
+    Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category);
 
     void setTotalSales(List<OrderItem> items);
 
