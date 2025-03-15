@@ -4,6 +4,7 @@ import bg.tshirt.config.EcontConfig;
 import bg.tshirt.database.dto.econt.*;
 import bg.tshirt.service.EcontCityService;
 import bg.tshirt.service.EcontOfficesService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -24,6 +25,7 @@ public class EcontOfficesServiceImpl implements EcontOfficesService {
     }
 
     @Override
+    @Cacheable(value = "econtOffices")
     public List<EcontOfficesDTO> getOffices(String name) {
         String[] tokens = name.trim().split("[\\p{Punct}\\s]+");;
 

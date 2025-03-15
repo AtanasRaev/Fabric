@@ -13,6 +13,8 @@ import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.ImageService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -65,6 +67,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @Cacheable(value = "clothing", key = "#id")
     public ClothingDetailsPageDTO findById(Long id) {
         Optional<ClothingDetailsPageDTO> optional = this.clothingRepository.findById(id)
                 .map(clothing -> this.modelMapper.map(clothing, ClothingDetailsPageDTO.class));
@@ -91,6 +94,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @CacheEvict(value = "clothing", key = "#id")
     public boolean editClothing(ClothingEditValidationDTO clothingDTO, Long id) {
         Clothing clothing = this.clothingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Clothing with id: %d is not found", id)));
@@ -118,6 +122,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @Cacheable(value = "clothingQuery", key = "#query + '_' + #pageable.pageNumber")
     public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query) {
         return this.clothingRepository.findByQuery(pageable, "%" + query + "%")
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
@@ -175,6 +180,7 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "clothing", key = "#id")
     public boolean delete(Long id) {
         Optional<Clothing> optional = this.clothingRepository.findById(id);
         if (optional.isEmpty()) {
@@ -228,6 +234,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @CacheEvict(value = "clothingPrices", allEntries = true)
     @Transactional
     public int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO) {
         if (clothingPriceEditDTO.getPrice() == null) {
