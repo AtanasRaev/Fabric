@@ -6,9 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CacheScheduler {
-    @CacheEvict(value = "econtCities", allEntries = true)
-    @Scheduled(fixedRate = 5 * 24 * 60 * 60 * 1000)
+    @CacheEvict(value = {"econtCities", "econtOffices"}, allEntries = true)
+    @Scheduled(fixedRate = 30L * 24 * 60 * 60 * 1000)
     public void clearEcontCitiesCache() {
     }
 }
+
 
