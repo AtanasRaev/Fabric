@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final PhoneNumberUtils phoneNumberUtils;
     private final ClothingService clothingService;
-    private final static int ADMINS_COUNT = 1;
-    private static final int MODERATOR_COUNT = 1;
+    private final static int ADMINS_COUNT = 2;
+    private static final int MODERATOR_COUNT = 2;
 
     public UserServiceImpl(UserRepository userRepository,
                            JwtTokenProvider jwtTokenProvider,
