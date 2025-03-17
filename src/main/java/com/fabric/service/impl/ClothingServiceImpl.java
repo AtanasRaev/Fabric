@@ -295,6 +295,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @Cacheable(value = "categories")
     public Map<Type, List<Category>> getAllCategories() {
         List<Object[]> results = this.clothingRepository.findTypesAndCategories();
         Map<Type, List<Category>> typeCategoriesMap = new HashMap<>();
