@@ -132,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
                                 if (clothing == null) {
                                     throw new NotFoundException("Clothing with id " + itemDTO.getClothingId() + " not found");
                                 }
-                                itemDTO.setName(getTypeOnBulgarian(clothing) + " " + clothing.getName());
+                                itemDTO.setName(getTypeOnBulgarian(clothing, itemDTO.getType()) + " " + clothing.getName());
                                 itemDTO.setModel(clothing.getModel());
                             }).collect(Collectors.toList())
                     );
@@ -259,10 +259,12 @@ public class OrderServiceImpl implements OrderService {
         return (index == -1) ? input : input.substring(0, index);
     }
 
-    private static String getTypeOnBulgarian(ClothingDetailsPageDTO byId) {
+    private static String getTypeOnBulgarian(ClothingDetailsPageDTO byId, String type) {
         String name;
         switch (byId.getType()) {
-            case T_SHIRT -> name = "Тениска";
+            case T_SHIRT -> {
+                name = "Тениска с къс ръкав".equals(type) ? "Тениска" : "Блуза с дълъг ръкав";
+            }
             case KIT -> name = "Комплект";
             case LONG_T_SHIRT -> name = "Блуза с дълъг ръкав";
             case SWEATSHIRT -> name = "Суитчър";
