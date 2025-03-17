@@ -41,7 +41,7 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     List<Clothing> findByModel(String model);
 
     @Query("SELECT c.category FROM Clothing c WHERE LOWER(c.type) LIKE LOWER(:type) GROUP BY c.category")
-    List<Category> countClothingByCategory(String type);
+    List<Category> getCategoriesByType(String type);
 
     @Query("SELECT new com.fabric.database.dto.clothes.ClothingPriceDTO(c.type, c.price) " +
             "FROM Clothing c " +

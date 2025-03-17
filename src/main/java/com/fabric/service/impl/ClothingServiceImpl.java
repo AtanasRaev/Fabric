@@ -234,8 +234,8 @@ public class ClothingServiceImpl implements ClothingService {
 
 
     @Override
-    public List<Category> getClothingCountByCategories(String type) {
-        return this.clothingRepository.countClothingByCategory(type);
+    public List<Category> getCategoriesByType(String type) {
+        return this.clothingRepository.getCategoriesByType(type);
     }
 
     @Override
