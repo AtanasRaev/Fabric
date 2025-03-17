@@ -43,4 +43,6 @@ public interface ClothingService {
     int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO);
 
     Map<Type, Double> getDiscountPrices();
+
+    Map<Type, List<Category>> getAllCategories();
 }

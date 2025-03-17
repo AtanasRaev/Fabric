@@ -192,6 +192,11 @@ public class ClothingController {
         return ResponseEntity.ok(this.clothingService.getCategoriesByType(type));
     }
 
+    @GetMapping("/categories")
+    public ResponseEntity<?> getAllCategories() {
+        return ResponseEntity.ok(this.clothingService.getAllCategories());
+    }
+
     private Pageable getPageableSearch(int page, int size, String sort) {
         return StringUtils.hasText(sort) ? getPageable(page, size, sort) : PageRequest.of(page - 1, size);
     }

@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -63,4 +64,8 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
 
     @Query("SELECT MIN(c.discountPrice) FROM Clothing c WHERE c.type = :type")
     Double findDiscountPriceByType(Type type);
+
+    @Query("SELECT c.type, c.category FROM Clothing c GROUP BY c.type, c.category")
+    List<Object[]> findTypesAndCategories();
+
 }

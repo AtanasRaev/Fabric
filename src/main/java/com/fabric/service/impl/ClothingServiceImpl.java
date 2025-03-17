@@ -294,6 +294,20 @@ public class ClothingServiceImpl implements ClothingService {
         return discountPrices;
     }
 
+    @Override
+    public Map<Type, List<Category>> getAllCategories() {
+        List<Object[]> results = this.clothingRepository.findTypesAndCategories();
+        Map<Type, List<Category>> typeCategoriesMap = new HashMap<>();
+
+        for (Object[] row : results) {
+            Type type = (Type) row[0];
+            Category category = (Category) row[1];
+            typeCategoriesMap.computeIfAbsent(type, k -> new ArrayList<>()).add(category);
+        }
+
+        return typeCategoriesMap;
+    }
+
     private void addImagesToKit(ClothingPageDTO clothing, String model) {
         List<Clothing> byModel = this.clothingRepository.findByModel(model);
         if (byModel.isEmpty()) {
