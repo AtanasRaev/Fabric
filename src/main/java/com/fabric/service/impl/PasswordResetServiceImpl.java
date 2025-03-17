@@ -3,6 +3,7 @@ package com.fabric.service.impl;
 import com.fabric.database.dto.user.UserDTO;
 import com.fabric.database.entity.PasswordResetToken;
 import com.fabric.database.repository.PasswordResetTokenRepository;
+import com.fabric.exceptions.NotFoundException;
 import com.fabric.service.EmailService;
 import com.fabric.service.PasswordResetService;
 import com.fabric.service.UserService;
@@ -38,17 +39,20 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Transactional
     public void createPasswordResetToken(String email) {
         UserDTO user = userService.findByEmail(email);
-        if (user != null) {
-            String token = UUID.randomUUID().toString();
-            Instant expiryDate = Instant.now().plusMillis(expirationInMs);
 
-            PasswordResetToken resetToken = new PasswordResetToken(email, token, expiryDate);
-            this.tokenRepository.deleteByUserEmail(email);
-            this.tokenRepository.save(resetToken);
-
-            String resetLink = this.appUrl + "/reset-password?token=" + token;
-            this.emailService.sendPasswordResetEmail(email, resetLink);
+        if (user == null) {
+            throw new NotFoundException("Email not found");
         }
+
+        String token = UUID.randomUUID().toString();
+        Instant expiryDate = Instant.now().plusMillis(expirationInMs);
+
+        PasswordResetToken resetToken = new PasswordResetToken(email, token, expiryDate);
+        this.tokenRepository.deleteByUserEmail(email);
+        this.tokenRepository.save(resetToken);
+
+        String resetLink = this.appUrl + "/reset-password?token=" + token;
+        this.emailService.sendPasswordResetEmail(email, resetLink);
     }
 
     @Override

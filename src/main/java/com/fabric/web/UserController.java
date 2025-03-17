@@ -111,7 +111,7 @@ public class UserController {
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDTO forgotPasswordDTO) {
         this.passwordResetService.createPasswordResetToken(forgotPasswordDTO.getEmail());
-        return ResponseEntity.ok("If an account exists for that email, a reset link has been sent.");
+        return ResponseEntity.ok("A reset link has been sent.");
     }
 
     @PostMapping("/reset-password")
