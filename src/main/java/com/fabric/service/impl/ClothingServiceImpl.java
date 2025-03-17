@@ -39,7 +39,10 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    @CacheEvict(value = "clothingQuery", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "categories", key = "#clothingDTO.type"),
+            @CacheEvict(value = "clothingQuery", allEntries = true)
+    })
     public boolean addClothing(ClothingValidationDTO clothingDTO) {
         Optional<Clothing> optional = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
 
@@ -211,7 +214,8 @@ public class ClothingServiceImpl implements ClothingService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "clothing", key = "#id"),
-            @CacheEvict(value = "clothingQuery", allEntries = true)
+            @CacheEvict(value = "clothingQuery", allEntries = true),
+            @CacheEvict(value = "categories", allEntries = true),
     })
     public boolean delete(Long id) {
         Optional<Clothing> optional = this.clothingRepository.findById(id);
@@ -234,6 +238,7 @@ public class ClothingServiceImpl implements ClothingService {
 
 
     @Override
+    @Cacheable(value = "categories", key = "#type")
     public List<Category> getCategoriesByType(String type) {
         return this.clothingRepository.getCategoriesByType(type);
     }

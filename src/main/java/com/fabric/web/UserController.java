@@ -111,7 +111,7 @@ public class UserController {
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDTO forgotPasswordDTO) {
         this.passwordResetService.createPasswordResetToken(forgotPasswordDTO.getEmail());
-        return ResponseEntity.ok("A reset link has been sent.");
+        return ResponseEntity.ok(Map.of("success", "A reset link has been sent."));
     }
 
     @PostMapping("/reset-password")
@@ -120,7 +120,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Invalid or expired token.");
         }
         boolean reset = this.passwordResetService.resetPassword(resetPasswordDTO.getToken(), resetPasswordDTO.getPassword());
-        return reset ? ResponseEntity.ok("Your password has been updated successfully.") : ResponseEntity.badRequest().body("Password reset failed.");
+        return reset ? ResponseEntity.ok(Map.of("success", "Your password has been updated successfully.")) : ResponseEntity.badRequest().body(Map.of("error", "Password reset failed."));
     }
 
     @PutMapping("/wishlist")

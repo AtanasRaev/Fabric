@@ -33,6 +33,11 @@ public class CacheConfig {
                         .maximumSize(100)
                         .build());
 
+        CaffeineCache clothingCategoriesCache = new CaffeineCache("categories",
+                Caffeine.newBuilder()
+                        .maximumSize(2)
+                        .build());
+
         CaffeineCache econtCitiesCache = new CaffeineCache("econtCities",
                 Caffeine.newBuilder()
                         .expireAfterWrite(30, TimeUnit.DAYS)
@@ -50,7 +55,7 @@ public class CacheConfig {
                         .maximumSize(100)
                         .build());
 
-        cacheManager.setCaches(List.of(userProfileCache, clothingCache, clothingQueryCache, econtCitiesCache, econtOfficesCache, ordersCache));
+        cacheManager.setCaches(List.of(userProfileCache, clothingCache, clothingQueryCache, clothingCategoriesCache, econtCitiesCache, econtOfficesCache, ordersCache));
         return cacheManager;
     }
 }
