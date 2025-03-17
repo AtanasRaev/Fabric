@@ -189,7 +189,7 @@ public class ClothingController {
 
     @GetMapping("/category")
     public ResponseEntity<?> getCategories(@RequestParam String type) {
-        return ResponseEntity.ok(this.clothingService.getClothingCountByCategories(type));
+        return ResponseEntity.ok(this.clothingService.getCategoriesByType(type));
     }
 
     private Pageable getPageableSearch(int page, int size, String sort) {
