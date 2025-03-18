@@ -40,7 +40,7 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "categories", key = "#clothingDTO.type"),
+            @CacheEvict(value = "categories", allEntries = true),
             @CacheEvict(value = "clothingQuery", allEntries = true)
     })
     public boolean addClothing(ClothingValidationDTO clothingDTO) {
@@ -101,6 +101,7 @@ public class ClothingServiceImpl implements ClothingService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "clothing", key = "#id"),
+            @CacheEvict(value = "categories", allEntries = true),
             @CacheEvict(value = "clothingQuery", allEntries = true)
     })
     public boolean editClothing(ClothingEditValidationDTO clothingDTO, Long id) {
