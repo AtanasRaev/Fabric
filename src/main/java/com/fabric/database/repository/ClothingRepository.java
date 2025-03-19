@@ -20,11 +20,25 @@ import java.util.Optional;
 public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     Optional<Clothing> findByModelAndTypeAndCategory(String model, Type type, Category category);
 
-    @Query("SELECT c FROM Clothing c WHERE LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)")
+    @Query("SELECT c FROM Clothing c " +
+            "WHERE c.id IN (" +
+            "   SELECT MIN(c2.id) FROM Clothing c2 " +
+            "   WHERE LOWER(c2.name) LIKE LOWER(:query) OR LOWER(c2.model) LIKE LOWER(:query) " +
+            "   GROUP BY c2.model, c2.type" +
+            ")")
     Page<Clothing> findByQuery(Pageable pageable, @Param("query") String query);
 
-    @Query("SELECT c FROM Clothing c WHERE (LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)) AND LOWER(c.type) IN (:type)")
-    Page<Clothing> findByQueryAndType(Pageable pageable, @Param("query") String query, @Param("type") List<String> type);
+    @Query("SELECT c FROM Clothing c " +
+            "WHERE c.id IN (" +
+            "    SELECT MIN(c2.id) FROM Clothing c2 " +
+            "    WHERE (LOWER(c2.name) LIKE LOWER(:query) OR LOWER(c2.model) LIKE LOWER(:query)) " +
+            "      AND LOWER(c2.type) IN (:type) " +
+            "    GROUP BY c2.model, c2.type" +
+            ")")
+    Page<Clothing> findByQueryAndType(Pageable pageable,
+                                      @Param("query") String query,
+                                      @Param("type") List<String> type);
+
 
     @Query("SELECT c FROM Clothing c WHERE LOWER(c.category) LIKE LOWER(:category)")
     Page<Clothing> findByCategory(Pageable pageable, @Param("category") String category);
