@@ -64,7 +64,7 @@ public class ImageServiceImpl implements ImageService {
             return null;
         }
 
-        String uniqueImageFront = cloth.getModel() + getModelType(cloth.getType()) + "_" + side;
+        String uniqueImageFront = cloth.getModel() + cloth.getCategory() + getModelType(cloth.getType()) + "_" + side;
         return uploadImage(file, uniqueImageFront, cloth);
     }
 
