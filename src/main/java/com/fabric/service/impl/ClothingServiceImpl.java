@@ -44,7 +44,7 @@ public class ClothingServiceImpl implements ClothingService {
             @CacheEvict(value = "clothingQuery", allEntries = true)
     })
     public boolean addClothing(ClothingValidationDTO clothingDTO) {
-        Optional<Clothing> optional = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
+        Optional<Clothing> optional = this.clothingRepository.findByModelAndTypeAndCategory(clothingDTO.getModel(), clothingDTO.getType(), clothingDTO.getCategory());
 
         if (optional.isPresent()) {
             return false;
@@ -112,7 +112,7 @@ public class ClothingServiceImpl implements ClothingService {
             return false;
         }
 
-        Optional<Clothing> byModelAndType = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
+        Optional<Clothing> byModelAndType = this.clothingRepository.findByModelAndTypeAndCategory(clothingDTO.getModel(), clothingDTO.getType(), clothingDTO.getCategory());
         if (byModelAndType.isPresent()) {
             if (clothing.getId() != byModelAndType.get().getId()) {
                 throw new ClothingAlreadyExistsException("Clothing with model " + clothingDTO.getModel() + " already exists.");

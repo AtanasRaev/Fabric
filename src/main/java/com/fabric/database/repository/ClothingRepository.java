@@ -14,12 +14,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
 public interface ClothingRepository extends JpaRepository<Clothing, Long> {
-    Optional<Clothing> findByModelAndType(String model, Type type);
+    Optional<Clothing> findByModelAndTypeAndCategory(String model, Type type, Category category);
 
     @Query("SELECT c FROM Clothing c WHERE LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)")
     Page<Clothing> findByQuery(Pageable pageable, @Param("query") String query);
@@ -67,5 +66,4 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
 
     @Query("SELECT c.type, c.category FROM Clothing c GROUP BY c.type, c.category")
     List<Object[]> findTypesAndCategories();
-
 }
