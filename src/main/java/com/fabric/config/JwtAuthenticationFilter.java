@@ -34,12 +34,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
+        String method = request.getMethod();
 
-        if ("/refresh-token".equals(requestUri) ||
-                "/users/login".equals(requestUri) ||
-                "/users/register".equals(requestUri) ||
-                "/users/forgot-password".equals(requestUri) ||
-                "/users/reset-password".equals(requestUri)) {
+        if (isPublicEndpoint(requestUri, method)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -77,6 +74,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicEndpoint(String uri, String method) {
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+        if ("GET".equalsIgnoreCase(method) && uri.startsWith("/clothes/")) {
+            return true;
+        }
+        return uri.equals("/users/login") ||
+                uri.equals("/users/register") ||
+                uri.equals("/orders/create") ||
+                uri.equals("/refresh-token") ||
+                uri.startsWith("/econt/") ||
+                uri.equals("/users/forgot-password") ||
+                uri.equals("/users/reset-password") ||
+                uri.equals("/ping");
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
