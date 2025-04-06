@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestUri = request.getRequestURI();
         String method = request.getMethod();
 
-        if (isPublicEndpoint(requestUri, method)) {
+        if (isPublicEndpoint(requestUri, method, request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -76,11 +76,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicEndpoint(String uri, String method) {
+    private boolean isPublicEndpoint(String uri, String method, HttpServletRequest request) {
         if ("OPTIONS".equalsIgnoreCase(method)) {
             return true;
         }
-        if ("GET".equalsIgnoreCase(method) && uri.startsWith("/clothes/")) {
+        if ("GET".equalsIgnoreCase(method) && request.getServletPath().startsWith("/clothes/")) {
             return true;
         }
         return uri.equals("/users/login") ||
@@ -100,5 +100,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
 }
