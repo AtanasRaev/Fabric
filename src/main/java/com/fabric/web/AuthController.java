@@ -50,13 +50,13 @@ public class AuthController {
         String refreshToken = httpRequest.getHeader("Refresh-Token");
         if (!StringUtils.hasText(refreshToken)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Refresh token is missing"));
+                    .body(Map.of("error", "Token has expired"));
         }
 
         try {
             if (!isRefreshTokenValid(refreshToken, httpRequest)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "Invalid refresh token"));
+                        .body(Map.of("error", "Token has expired"));
             }
 
             String email = jwtTokenProvider.getEmailFromJwt(refreshToken);
@@ -64,12 +64,12 @@ public class AuthController {
 
             if (!refreshTokenService.isValid(jti)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "Refresh token is no longer valid"));
+                        .body(Map.of("error", "Token has expired"));
             }
 
             if (isRefreshTokenAboutToExpire(refreshToken)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "Refresh token is about to expire"));
+                        .body(Map.of("error", "Token has expired"));
             }
 
             refreshTokenService.revokeToken(jti);
@@ -83,12 +83,9 @@ public class AuthController {
             );
 
             return ResponseEntity.ok(tokenResponse);
-        } catch (ExpiredJwtException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Refresh token has expired"));
         } catch (JwtException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid refresh token"));
+                    .body(Map.of("error", "Token has expired"));
         }
     }
     private boolean isRateLimitExceeded(HttpServletRequest httpRequest) {
