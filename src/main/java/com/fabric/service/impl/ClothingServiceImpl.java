@@ -310,7 +310,7 @@ public class ClothingServiceImpl implements ClothingService {
         return typeCategoriesMap;
     }
 
-    private void addImagesToKit(ClothingPageDTO clothing, String model) {
+    protected void addImagesToKit(ClothingPageDTO clothing, String model) {
         List<Clothing> byModel = this.clothingRepository.findByModel(model);
         if (byModel.isEmpty()) {
             return;
@@ -329,13 +329,13 @@ public class ClothingServiceImpl implements ClothingService {
                             String numberPart = publicId.replaceAll("[^0-9]", "");
                             int numericValue = numberPart.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(numberPart);
 
-                            if (publicId.matches("\\d+_F")) {
+                            if (publicId.matches("^(\\d+_F|\\d+[A-Z]+__F)$")) {
                                 firstFront.put(numericValue, imageDTO);
-                            } else if (publicId.matches("\\d+_B")) {
+                            } else if (publicId.matches("^(\\d+_B|\\d+[A-Z]+__B)$")) {
                                 firstBack.put(numericValue, imageDTO);
-                            } else if (publicId.matches("\\d+K_F") && !publicId.matches(".*KT.*")) {
+                            } else if (publicId.matches("^\\d+K_F$|^\\d+[A-Z]+_K_F$")) {
                                 kFront.put(numericValue, imageDTO);
-                            } else if (publicId.matches("\\d+K_B") && !publicId.matches(".*KT.*")) {
+                            } else if (publicId.matches("^\\d+K_B$|^\\d+[A-Z]+_K_B$")) {
                                 kBack.put(numericValue, imageDTO);
                             }
                         })
