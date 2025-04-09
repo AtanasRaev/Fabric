@@ -1,8 +1,8 @@
 package com.fabric.database.dto.clothes;
 
-public class ImagePageDTO {
-    private String path;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class ImagePageDTO {
     private String publicId;
 
     public String getSide() {
@@ -13,12 +13,9 @@ public class ImagePageDTO {
         return "back";
     }
 
+    @JsonProperty("path")
     public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
+        return "/" + this.publicId;
     }
 
     public String getPublicId() {
