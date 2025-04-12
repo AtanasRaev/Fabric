@@ -97,7 +97,7 @@ public class ClothingController {
                     "message", "Id must be a positive number"
             ));
         }
-        ClothingDetailsPageDTO dto = this.clothingService.findById(id);
+        ClothingDetailsPageDTO dto = this.clothingService.findById(id, "selected");
 
         if (dto == null) {
             throw new NotFoundException("Clothing not found in the system.");
@@ -135,7 +135,7 @@ public class ClothingController {
         ));
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/delete/{id}")
     public ResponseEntity<?> deleteClothById(@PathVariable("id") Long id,
                                              HttpServletRequest request) {
         if (id == null || id < 1) {
@@ -147,7 +147,7 @@ public class ClothingController {
 
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothingService.delete(id)) {
+        if (!this.clothingService.remove(id)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", String.format("Clothing with id: %d was not found", id)));
         }
