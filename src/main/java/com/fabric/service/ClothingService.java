@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public interface ClothingService {
     CompletableFuture<Boolean> addClothing(ClothingValidationDTO clothingDTO);
 
-    ClothingDetailsPageDTO findById(Long id);
+    ClothingDetailsPageDTO findById(Long id, String selected);
 
     Clothing getClothingEntityById(Long id);
 
@@ -35,7 +35,7 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> getAllPage(Pageable pageable);
 
-    boolean delete(Long id);
+    boolean remove(Long id);
 
     List<Category> getCategoriesByType(String type);
 
