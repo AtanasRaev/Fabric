@@ -40,6 +40,9 @@ public class Clothing {
     @Column(nullable = false)
     private int saleCount = 0;
 
+    @Column(nullable = true)
+    private boolean selected;
+
     @OneToMany(mappedBy = "cloth",
             fetch = FetchType.EAGER)
     private List<Image> images;
@@ -52,6 +55,7 @@ public class Clothing {
         this.type = type;
         this.images = new ArrayList<>();
         this.category = category;
+        this.selected = true;
     }
 
     public Clothing() {
@@ -139,5 +143,13 @@ public class Clothing {
 
     public void updateTotalSales() {
         this.saleCount += 1;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
