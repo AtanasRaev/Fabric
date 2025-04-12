@@ -57,7 +57,7 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     @Query("SELECT c FROM Clothing c WHERE c.selected = true")
     Page<Clothing> findAllPage(Pageable pageable);
 
-    List<Clothing> findByModel(String model);
+    Optional<Clothing> findFirstByModelAndTypeOrderByIdAsc(String model, Type type);
 
     @Query("SELECT c.category FROM Clothing c WHERE c.selected = TRUE AND LOWER(c.type) LIKE LOWER(:type) GROUP BY c.category")
     List<Category> getCategoriesByType(String type);

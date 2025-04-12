@@ -118,7 +118,7 @@ public class ClothingServiceImpl implements ClothingService {
         Optional<Clothing> optional;
         switch (selected) {
             case "all" -> optional = this.clothingRepository.findById(id);
-            case "selected" -> optional =this.clothingRepository.findByIdSelected(id, true);
+            case "selected" -> optional = this.clothingRepository.findByIdSelected(id, true);
             default -> optional = this.clothingRepository.findByIdSelected(id, false);
         }
 
@@ -358,7 +358,11 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     protected void addImagesToKit(ClothingPageDTO clothing, String model) {
-        List<Clothing> byModel = this.clothingRepository.findByModel(model);
+        List<Clothing> byModel = new ArrayList<>();
+
+        this.clothingRepository.findFirstByModelAndTypeOrderByIdAsc(model, Type.T_SHIRT).ifPresent(byModel::add);
+        this.clothingRepository.findFirstByModelAndTypeOrderByIdAsc(model, Type.SHORTS).ifPresent(byModel::add);
+
         if (byModel.isEmpty()) {
             return;
         }
