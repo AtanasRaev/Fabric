@@ -239,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
         return item;
     }
 
-    private static String extractSize(String input) {
+    protected static String extractSize(String input) {
         int index = input.indexOf(' ');
 
         if (index == -1) {
@@ -259,7 +259,7 @@ public class OrderServiceImpl implements OrderService {
         return (index == -1) ? input : input.substring(0, index);
     }
 
-    private static String getTypeOnBulgarian(ClothingDetailsPageDTO byId, String type) {
+    protected static String getTypeOnBulgarian(ClothingDetailsPageDTO byId, String type) {
         String name;
         switch (byId.getType()) {
             case T_SHIRT -> {
