@@ -7,17 +7,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ImageService {
-    Image uploadImage(MultipartFile multipartFile, String publicId, Clothing cloth);
-
     void saveAll(List<Image> extractedImages);
 
     void deleteAll(List<String> publicIds);
 
-    Image saveImageInCloud(MultipartFile file, Clothing cloth, String side);
+    void saveImageInCloud(MultipartFile file, Clothing clothing, String side);
 
-    Image findByPath(String path);
+    void saveImageInHost(MultipartFile file, Clothing clothing, String side);
 
-    void deleteImage(Image byPath);
+    String getUniqueImageId(Clothing clothing, String side);
 
-    void save(Image image);
+    Image findByPublicId(String path);
+
+    void deleteImage(Image image);
 }
