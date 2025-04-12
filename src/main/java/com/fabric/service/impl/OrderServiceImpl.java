@@ -128,7 +128,7 @@ public class OrderServiceImpl implements OrderService {
                     dto.setCustomer(order.getFirstName() + " " + order.getLastName());
                     dto.setItems(
                             dto.getItems().stream().peek(itemDTO -> {
-                                ClothingDetailsPageDTO clothing = this.clothingService.findById(itemDTO.getClothingId());
+                                ClothingDetailsPageDTO clothing = this.clothingService.findById(itemDTO.getClothingId(), "all");
                                 if (clothing == null) {
                                     throw new NotFoundException("Clothing with id " + itemDTO.getClothingId() + " not found");
                                 }
