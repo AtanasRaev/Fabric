@@ -41,6 +41,7 @@ public class ClothingServiceImpl implements ClothingService {
         this.modelMapper = modelMapper;
     }
 
+    @Transactional
     @Override
     @Caching(evict = {
             @CacheEvict(value = "categories", allEntries = true),
@@ -49,16 +50,32 @@ public class ClothingServiceImpl implements ClothingService {
     public CompletableFuture<Boolean> addClothing(ClothingValidationDTO clothingDTO) {
         Optional<Clothing> optional = this.clothingRepository.findByModelAndTypeAndCategory(clothingDTO.getModel(), clothingDTO.getType(), clothingDTO.getCategory());
 
-        if (optional.isPresent()) {
+        if (optional.isPresent() && optional.get().isSelected()) {
             return CompletableFuture.completedFuture(false);
         }
 
-        Clothing clothing = new Clothing(clothingDTO.getName(),
-                clothingDTO.getDescription(),
-                clothingDTO.getPrice(),
-                clothingDTO.getModel().substring(0, 3),
-                clothingDTO.getType(),
-                clothingDTO.getCategory());
+        Clothing clothing;
+
+        if (optional.isPresent() && !optional.get().isSelected()) {
+            clothing = optional.get();
+            clothing.setSelected(true);
+
+            List<String> publicIds = clothing.getImages()
+                    .stream()
+                    .map(Image::getPublicId)
+                    .toList();
+            this.imageService.deleteAll(publicIds);
+
+            clothing.getImages().clear();
+        } else {
+            clothing = new Clothing(clothingDTO.getName(),
+                    clothingDTO.getDescription(),
+                    clothingDTO.getPrice(),
+                    clothingDTO.getModel().substring(0, 3),
+                    clothingDTO.getType(),
+                    clothingDTO.getCategory());
+        }
+
 
         Double discountPriceByType = this.clothingRepository.findDiscountPriceByType(clothingDTO.getType());
         if (discountPriceByType != null) {
@@ -97,15 +114,27 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Override
     @Cacheable(value = "clothing", key = "#id")
-    public ClothingDetailsPageDTO findById(Long id) {
-        Optional<ClothingDetailsPageDTO> optional = this.clothingRepository.findById(id)
-                .map(clothing -> this.modelMapper.map(clothing, ClothingDetailsPageDTO.class));
+    public ClothingDetailsPageDTO findById(Long id, String selected) {
+        Optional<Clothing> optional;
+        switch (selected) {
+            case "all" -> optional = this.clothingRepository.findById(id);
+            case "selected" -> optional =this.clothingRepository.findByIdSelected(id, true);
+            default -> optional = this.clothingRepository.findByIdSelected(id, false);
+        }
 
         if (optional.isEmpty()) {
             return null;
         }
 
-        ClothingDetailsPageDTO clothing = optional.get();
+        Optional<ClothingDetailsPageDTO> optionalDTO = optional
+                .map(clothing -> this.modelMapper.map(clothing, ClothingDetailsPageDTO.class));
+
+
+        if (optionalDTO.isEmpty()) {
+            return null;
+        }
+
+        ClothingDetailsPageDTO clothing = optionalDTO.get();
 
         if (clothing.getType() != Type.KIT) {
             return clothing;
@@ -242,22 +271,16 @@ public class ClothingServiceImpl implements ClothingService {
             @CacheEvict(value = "clothingQuery", allEntries = true),
             @CacheEvict(value = "categories", allEntries = true),
     })
-    public boolean delete(Long id) {
+    public boolean remove(Long id) {
         Optional<Clothing> optional = this.clothingRepository.findById(id);
         if (optional.isEmpty()) {
             return false;
         }
         Clothing clothing = optional.get();
+        clothing.setSelected(false);
 
-        List<String> publicIds = clothing.getImages()
-                .stream()
-                .map(Image::getPublicId)
-                .toList();
-        this.imageService.deleteAll(publicIds);
+        this.clothingRepository.save(clothing);
 
-        clothing.getImages().clear();
-
-        this.clothingRepository.delete(clothing);
         return true;
     }
 
