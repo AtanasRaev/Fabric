@@ -71,9 +71,14 @@ public class ClothingController {
                                       HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothingService.addClothing(clothDTO)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "Clothing with this model and type already exists."));
+        try {
+            if (!this.clothingService.addClothing(clothDTO).get()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("message", "Clothing with this model and type already exists."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error occurred"));
         }
 
         return ResponseEntity.ok(Map.of(
