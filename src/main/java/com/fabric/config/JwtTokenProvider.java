@@ -165,7 +165,7 @@ public class JwtTokenProvider {
                 this.isTokenTypeValid(token, "access");
     }
 
-    private Claims parseToken(String token) {
+    protected Claims parseToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
