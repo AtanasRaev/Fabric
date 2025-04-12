@@ -50,6 +50,11 @@ app:
   jwtRefreshExpirationInMs: ${JWT_REFRESH_TIME}
   passwordResetExpirationInMs: ${PASSWORD_RESET_EXPIRATION}
   frontendUrl: ${FRONTEND_URL}
+  ftpServer: ${FTP_SERVER}
+  ftpPort: ${FTP_PORT}
+  ftpUser: ${FTP_USER}
+  ftpPassword: ${FTP_PASSWORD}
+
 cloud:
   cloudName: ${CLOUD_NAME}
   apiKey: ${CLOUD_API_KEY}

@@ -32,15 +32,35 @@ dependencies {
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.12.47'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
     implementation 'com.mailjet:mailjet-client:5.2.5'
+    implementation 'commons-net:commons-net:3.9.0'
+    implementation 'org.sejda.imageio:webp-imageio:0.1.6'
 
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     runtimeOnly 'org.postgresql:postgresql'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.5'
+    testImplementation 'org.springframework.security:spring-security-test:6.1.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.3.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1'
+    testImplementation 'org.testcontainers:postgresql:1.18.3'
+    testImplementation 'org.testcontainers:junit-jupiter:1.18.3'
+}
+
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.junit.platform' && details.requested.name == 'junit-platform-commons') {
+            details.useVersion '1.10.0'
+        }
+    }
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
