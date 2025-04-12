@@ -88,11 +88,11 @@ public class EmailServiceImpl implements EmailService {
         order.getItems().stream()
                 .map(item -> {
                     String path = item.getClothing().getImages().getFirst().getPublicId().contains("_F")
-                            ? item.getClothing().getImages().getFirst().getPath()
-                            : item.getClothing().getImages().get(1).getPath();
+                            ? item.getClothing().getImages().getFirst().getPublicId()
+                            : item.getClothing().getImages().get(1).getPublicId();
                     return new OrderItemEmail(
                             item.getClothing().getName(),
-                            path,
+                            "/" + path,
                             item.getClothing().getModel(),
                             item.getSize(),
                             String.valueOf(item.getQuantity()),
