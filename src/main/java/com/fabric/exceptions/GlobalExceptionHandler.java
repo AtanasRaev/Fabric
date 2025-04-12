@@ -80,15 +80,33 @@ public class GlobalExceptionHandler {
                 .body(buildApiError("Invalid Phone Number", List.of(ex.getMessage()), HttpStatus.BAD_REQUEST));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(buildApiError("Internal Server Error", List.of(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
-    }
-
     @ExceptionHandler(ClothingAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleClothingAlreadyExistsException(ClothingAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(buildApiError("Clothing already exists", List.of(ex.getMessage()), HttpStatus.CONFLICT));
+    }
+
+    @ExceptionHandler(UnsupportedImageFormatException.class)
+    public ResponseEntity<ApiError> handleUnsupportedImageFormatException(UnsupportedImageFormatException ex) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(buildApiError("Unsupported Image Format", List.of(ex.getMessage()), HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+    }
+
+    @ExceptionHandler(ImageUploadFailedException.class)
+    public ResponseEntity<ApiError> handleImageUploadFailedException(ImageUploadFailedException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildApiError("Image Upload Failed", List.of(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @ExceptionHandler(ImageUploadException.class)
+    public ResponseEntity<ApiError> handleImageUploadException(ImageUploadException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildApiError("Image Upload Error", List.of(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildApiError("Internal Server Error", List.of(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }
