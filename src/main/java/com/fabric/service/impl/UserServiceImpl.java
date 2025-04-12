@@ -196,7 +196,7 @@ public class UserServiceImpl implements UserService {
 
                     c.getImages().forEach(i -> {
                         if (i.getPublicId().contains("_F")) {
-                            dto.setImage(i.getPath());
+                            dto.setImage("/" + i.getPublicId());
                         }
                     });
 
