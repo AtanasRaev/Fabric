@@ -16,5 +16,4 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     Optional<Image> findByPublicId(String publicId);
 
-    Optional<Image> findByPath(String path);
 }
