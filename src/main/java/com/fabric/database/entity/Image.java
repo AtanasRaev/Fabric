@@ -9,7 +9,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String path;
 
     @Column(unique = true, nullable = false)
@@ -22,8 +22,7 @@ public class Image {
     public Image() {
     }
 
-    public Image(String path, String publicId, Clothing cloth) {
-        this.path = path;
+    public Image(String publicId, Clothing cloth) {
         this.publicId = publicId;
         this.cloth = cloth;
     }
