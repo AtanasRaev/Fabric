@@ -10,15 +10,16 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public interface ClothingService {
-    boolean addClothing(ClothingValidationDTO clothAddDTO);
+    CompletableFuture<Boolean> addClothing(ClothingValidationDTO clothingDTO);
 
     ClothingDetailsPageDTO findById(Long id);
 
     Clothing getClothingEntityById(Long id);
 
-    boolean editClothing(ClothingEditValidationDTO clothAddDTO, Long id);
+    boolean editClothing(ClothingEditValidationDTO clothingDTO, Long id);
 
     Page<ClothingPageDTO> findByQuery(Pageable pageable, String query);
 
