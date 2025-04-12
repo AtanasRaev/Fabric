@@ -8,6 +8,7 @@ import com.fabric.database.entity.enums.Category;
 import com.fabric.database.entity.enums.Type;
 import com.fabric.database.repository.ClothingRepository;
 import com.fabric.exceptions.ClothingAlreadyExistsException;
+import com.fabric.exceptions.ImageUploadFailedException;
 import com.fabric.exceptions.NotFoundException;
 import com.fabric.service.ClothingService;
 import com.fabric.service.ImageService;
@@ -20,7 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 
@@ -43,11 +46,11 @@ public class ClothingServiceImpl implements ClothingService {
             @CacheEvict(value = "categories", allEntries = true),
             @CacheEvict(value = "clothingQuery", allEntries = true)
     })
-    public boolean addClothing(ClothingValidationDTO clothingDTO) {
+    public CompletableFuture<Boolean> addClothing(ClothingValidationDTO clothingDTO) {
         Optional<Clothing> optional = this.clothingRepository.findByModelAndTypeAndCategory(clothingDTO.getModel(), clothingDTO.getType(), clothingDTO.getCategory());
 
         if (optional.isPresent()) {
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
         Clothing clothing = new Clothing(clothingDTO.getName(),
@@ -63,12 +66,33 @@ public class ClothingServiceImpl implements ClothingService {
         }
 
         List<Image> images = new ArrayList<>();
-        addNewImages(clothingDTO, clothing, images);
-        clothing.setImages(images);
 
-        this.clothingRepository.save(clothing);
-        this.imageService.saveAll(images);
-        return true;
+
+        CompletableFuture<String> cloudinaryUpload = CompletableFuture.supplyAsync(() -> {
+            addNewImagesToCloud(clothingDTO, clothing);
+            return "Cloudinary";
+        });
+
+        CompletableFuture<String> hostUpload = CompletableFuture.supplyAsync(() -> {
+            addNewImagesToHost(clothingDTO, clothing);
+            return "Host";
+        });
+
+
+        return CompletableFuture.allOf(hostUpload, cloudinaryUpload)
+                .thenApply(successSource -> {
+                    images.addAll(List.of(
+                            new Image(this.imageService.getUniqueImageId(clothing, "F"), clothing),
+                            new Image(this.imageService.getUniqueImageId(clothing, "B"), clothing)
+                    ));
+
+                    clothing.setImages(images);
+                    this.clothingRepository.save(clothing);
+                    this.imageService.saveAll(images);
+                    return true;
+                }).exceptionally(ex -> {
+                    throw new ImageUploadFailedException("Both image uploads failed: " + ex.getMessage(), ex);
+                });
     }
 
     @Override
@@ -364,50 +388,80 @@ public class ClothingServiceImpl implements ClothingService {
         clothing.setCategory(clothingEditDTO.getCategory());
     }
 
-    private List<Image> processImages(ClothingEditValidationDTO clothDto, Clothing cloth) {
-        List<String> removedImagesPaths = clothDto.getRemovedImages();
+    private List<Image> processImages(ClothingEditValidationDTO clothingDto, Clothing clothing) {
+        List<String> removedImagesPublicId = clothingDto.getRemovedImages();
         List<Image> imagesToSave = new ArrayList<>();
 
-        if (!removedImagesPaths.isEmpty()) {
-            removeImages(removedImagesPaths);
+        if (!removedImagesPublicId.isEmpty()) {
+            removeImages(removedImagesPublicId);
         }
 
-        List<String> existingPaths = cloth.getImages()
+        List<String> existingPaths = clothing.getImages()
                 .stream()
-                .map(Image::getPath)
-                .filter(path -> !removedImagesPaths.contains(path))
+                .map(Image::getPublicId)
+                .filter(publicId -> !removedImagesPublicId.contains(publicId))
                 .toList();
 
         existingPaths.forEach(path -> {
-            Image image = this.imageService.findByPath(path);
+            Image image = this.imageService.findByPublicId(path);
             if (image != null) {
                 imagesToSave.add(image);
             }
         });
 
-        addNewImages(clothDto, cloth, imagesToSave);
+        CompletableFuture<String> cloudinaryUpload = CompletableFuture.supplyAsync(() -> {
+            addNewImagesToCloud(clothingDto, clothing);
+            return "Cloudinary";
+        });
+
+        CompletableFuture<String> hostUpload = CompletableFuture.supplyAsync(() -> {
+            addNewImagesToHost(clothingDto, clothing, imagesToSave);
+            return "Host";
+        });
+
+        CompletableFuture.allOf(hostUpload, cloudinaryUpload).join();
 
         return imagesToSave;
     }
 
     private void removeImages(List<String> removedImagesPaths) {
         removedImagesPaths.forEach(path -> {
-            Image image = this.imageService.findByPath(path);
+            Image image = this.imageService.findByPublicId(path);
             if (image != null) {
                 this.imageService.deleteImage(image);
             }
         });
     }
 
-    private void addNewImages(ClothingValidationDTO clothDto, Clothing cloth, List<Image> imagesToSave) {
-        if (clothDto.getFrontImage() != null && !clothDto.getFrontImage().isEmpty()) {
-            Image frontImage = this.imageService.saveImageInCloud(clothDto.getFrontImage(), cloth, "F");
-            imagesToSave.add(frontImage);
+    private void addNewImagesToCloud(ClothingValidationDTO clothingValidationDTO, Clothing clothing) {
+        if (clothingValidationDTO.getFrontImage() != null && !clothingValidationDTO.getFrontImage().isEmpty()) {
+            this.imageService.saveImageInCloud(clothingValidationDTO.getFrontImage(), clothing, "F");
         }
 
-        if (clothDto.getBackImage() != null && !clothDto.getBackImage().isEmpty()) {
-            Image backImage = this.imageService.saveImageInCloud(clothDto.getBackImage(), cloth, "B");
-            imagesToSave.add(backImage);
+        if (clothingValidationDTO.getBackImage() != null && !clothingValidationDTO.getBackImage().isEmpty()) {
+            this.imageService.saveImageInCloud(clothingValidationDTO.getBackImage(), clothing, "B");
+        }
+    }
+
+    private void addNewImagesToHost(ClothingValidationDTO clothingValidationDTO, Clothing clothing) {
+        if (clothingValidationDTO.getFrontImage() != null && !clothingValidationDTO.getFrontImage().isEmpty()) {
+            this.imageService.saveImageInHost(clothingValidationDTO.getFrontImage(), clothing, "F");
+        }
+
+        if (clothingValidationDTO.getBackImage() != null && !clothingValidationDTO.getBackImage().isEmpty()) {
+            this.imageService.saveImageInHost(clothingValidationDTO.getBackImage(), clothing, "B");
+        }
+    }
+
+    private void addNewImagesToHost(ClothingValidationDTO clothingValidationDTO, Clothing clothing, List<Image> imagesToSave) {
+        if (clothingValidationDTO.getFrontImage() != null && !clothingValidationDTO.getFrontImage().isEmpty()) {
+            this.imageService.saveImageInHost(clothingValidationDTO.getFrontImage(), clothing, "F");
+            imagesToSave.add(new Image(this.imageService.getUniqueImageId(clothing, "F"), clothing));
+        }
+
+        if (clothingValidationDTO.getBackImage() != null && !clothingValidationDTO.getBackImage().isEmpty()) {
+            this.imageService.saveImageInHost(clothingValidationDTO.getBackImage(), clothing, "B");
+            imagesToSave.add(new Image(this.imageService.getUniqueImageId(clothing, "B"), clothing));
         }
     }
 }
