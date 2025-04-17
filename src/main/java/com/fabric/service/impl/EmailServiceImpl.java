@@ -124,7 +124,7 @@ public class EmailServiceImpl implements EmailService {
                 .put("total", String.format("%.2f", order.getFinalPrice()))
                 .put("orderDate", date[0])
                 .put("orderDateHour", date[1])
-                .put("orderNumber", order.getId())
+                .put("orderNumber", order.getId() + 600)
                 .put("customerAddress", order.getAddress())
                 .put("customerPhone", order.getPhoneNumber())
                 .put("customerName", customerName)
