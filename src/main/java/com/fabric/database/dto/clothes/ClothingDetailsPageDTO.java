@@ -2,8 +2,12 @@ package com.fabric.database.dto.clothes;
 
 import com.fabric.database.entity.enums.Category;
 
+import java.util.List;
+
 public class ClothingDetailsPageDTO extends ClothingPageDTO {
     private Category category;
+
+    private List<String> tags;
 
     public ClothingDetailsPageDTO() {
     }
@@ -16,4 +20,11 @@ public class ClothingDetailsPageDTO extends ClothingPageDTO {
         this.category = category;
     }
 
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
 }
