@@ -47,6 +47,14 @@ public class Clothing {
             fetch = FetchType.EAGER)
     private List<Image> images;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "clothing_tags",
+            joinColumns = @JoinColumn(name = "clothing_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();
+
     public Clothing(String name, String description, double price, String model, Type type, Category category) {
         this.name = name;
         this.description = description;
@@ -54,6 +62,7 @@ public class Clothing {
         this.model = model;
         this.type = type;
         this.images = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.category = category;
         this.selected = true;
     }
@@ -151,5 +160,23 @@ public class Clothing {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public void addTag(Tag tag) {
+        this.tags.add(tag);
+        tag.getClothes().add(this);
+    }
+
+    public void removeTag(Tag tag) {
+        this.tags.remove(tag);
+        tag.getClothes().remove(this);
     }
 }
