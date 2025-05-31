@@ -85,4 +85,7 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
 
     @Query("SELECT c.type, c.category FROM Clothing c WHERE c.selected = TRUE GROUP BY c.type, c.category")
     List<Object[]> findTypesAndCategories();
+
+    @Query("SELECT c FROM Clothing c JOIN c.tags t WHERE t.name = :tagName AND c.selected = TRUE")
+    Page<Clothing> findByTagName(Pageable pageable, @Param("tagName") String tagName);
 }
