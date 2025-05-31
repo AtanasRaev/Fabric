@@ -4,15 +4,16 @@ import com.fabric.database.dto.clothes.*;
 import com.fabric.database.entity.Clothing;
 import com.fabric.database.entity.Image;
 import com.fabric.database.entity.OrderItem;
+import com.fabric.database.entity.Tag;
 import com.fabric.database.entity.enums.Category;
 import com.fabric.database.entity.enums.Type;
 import com.fabric.database.repository.ClothingRepository;
+import com.fabric.database.repository.TagRepository;
 import com.fabric.exceptions.ClothingAlreadyExistsException;
 import com.fabric.exceptions.ImageUploadFailedException;
 import com.fabric.exceptions.NotFoundException;
 import com.fabric.service.ClothingService;
 import com.fabric.service.ImageService;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,7 +21,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -30,13 +31,16 @@ import java.util.stream.Collectors;
 @Service
 public class ClothingServiceImpl implements ClothingService {
     private final ClothingRepository clothingRepository;
+    private final TagRepository tagRepository;
     private final ImageService imageService;
     private final ModelMapper modelMapper;
 
     public ClothingServiceImpl(ClothingRepository clothingRepository,
+                               TagRepository tagRepository,
                                ImageService imageService,
                                ModelMapper modelMapper) {
         this.clothingRepository = clothingRepository;
+        this.tagRepository = tagRepository;
         this.imageService = imageService;
         this.modelMapper = modelMapper;
     }
@@ -45,7 +49,8 @@ public class ClothingServiceImpl implements ClothingService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "categories", allEntries = true),
-            @CacheEvict(value = "clothingQuery", allEntries = true)
+            @CacheEvict(value = "clothingQuery", allEntries = true),
+            @CacheEvict(value = "clothingByTag", allEntries = true)
     })
     public CompletableFuture<Boolean> addClothing(ClothingValidationDTO clothingDTO) {
         Optional<Clothing> optional = this.clothingRepository.findByModelAndTypeAndCategory(clothingDTO.getModel(), clothingDTO.getType(), clothingDTO.getCategory());
@@ -95,6 +100,9 @@ public class ClothingServiceImpl implements ClothingService {
             return "Host";
         });
 
+        if (clothingDTO.getTags() != null && !clothingDTO.getTags().isEmpty()) {
+            processTags(clothingDTO.getTags(), clothing);
+        }
 
         return CompletableFuture.allOf(hostUpload, cloudinaryUpload)
                 .thenApply(successSource -> {
@@ -113,6 +121,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "clothing", key = "#id")
     public ClothingDetailsPageDTO findById(Long id, String selected) {
         Optional<Clothing> optional;
@@ -127,8 +136,16 @@ public class ClothingServiceImpl implements ClothingService {
         }
 
         Optional<ClothingDetailsPageDTO> optionalDTO = optional
-                .map(clothing -> this.modelMapper.map(clothing, ClothingDetailsPageDTO.class));
-
+                .map(clothing -> {
+                    ClothingDetailsPageDTO dto = this.modelMapper.map(clothing, ClothingDetailsPageDTO.class);
+                    if (clothing.getTags() != null) {
+                        List<String> tagNames = clothing.getTags().stream()
+                                .map(Tag::getName)
+                                .collect(Collectors.toList());
+                        dto.setTags(tagNames);
+                    }
+                    return dto;
+                });
 
         if (optionalDTO.isEmpty()) {
             return null;
@@ -155,7 +172,8 @@ public class ClothingServiceImpl implements ClothingService {
     @Caching(evict = {
             @CacheEvict(value = "clothing", key = "#id"),
             @CacheEvict(value = "categories", allEntries = true),
-            @CacheEvict(value = "clothingQuery", allEntries = true)
+            @CacheEvict(value = "clothingQuery", allEntries = true),
+            @CacheEvict(value = "clothingByTag", allEntries = true)
     })
     public boolean editClothing(ClothingEditValidationDTO clothingDTO, Long id) {
         Clothing clothing = this.clothingRepository.findById(id)
@@ -175,6 +193,10 @@ public class ClothingServiceImpl implements ClothingService {
         setClothDetails(clothing, clothingDTO);
 
         List<Image> updatedImages = processImages(clothingDTO, clothing);
+
+        if (clothingDTO.getTags() != null && !clothingDTO.getTags().isEmpty()) {
+            processTags(clothingDTO.getTags(), clothing);
+        }
 
         clothing.setImages(updatedImages);
         this.clothingRepository.save(clothing);
@@ -270,6 +292,7 @@ public class ClothingServiceImpl implements ClothingService {
             @CacheEvict(value = "clothing", key = "#id"),
             @CacheEvict(value = "clothingQuery", allEntries = true),
             @CacheEvict(value = "categories", allEntries = true),
+            @CacheEvict(value = "clothingByTag", allEntries = true)
     })
     public boolean remove(Long id) {
         Optional<Clothing> optional = this.clothingRepository.findById(id);
@@ -322,7 +345,8 @@ public class ClothingServiceImpl implements ClothingService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "clothing", allEntries = true),
-            @CacheEvict(value = "clothingQuery", allEntries = true)
+            @CacheEvict(value = "clothingQuery", allEntries = true),
+            @CacheEvict(value = "clothingByTag", allEntries = true)
     })
     public int updatePrices(String type, ClothingPriceEditDTO clothingPriceEditDTO) {
         if (clothingPriceEditDTO.getPrice() == null) {
@@ -355,6 +379,13 @@ public class ClothingServiceImpl implements ClothingService {
         }
 
         return typeCategoriesMap;
+    }
+
+    @Override
+    @Cacheable(value = "clothingByTag", key = "{#tagName, #pageable}")
+    public Page<ClothingPageDTO> findByTagName(Pageable pageable, String tagName) {
+        Page<Clothing> clothingPage = clothingRepository.findByTagName(pageable, tagName);
+        return clothingPage.map(clothing -> modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
     protected void addImagesToKit(ClothingPageDTO clothing, String model) {
@@ -489,6 +520,30 @@ public class ClothingServiceImpl implements ClothingService {
         if (clothingValidationDTO.getBackImage() != null && !clothingValidationDTO.getBackImage().isEmpty()) {
             this.imageService.saveImageInHost(clothingValidationDTO.getBackImage(), clothing, "B");
             imagesToSave.add(new Image(this.imageService.getUniqueImageId(clothing, "B"), clothing));
+        }
+    }
+
+    private void processTags(List<String> tagNames, Clothing clothing) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return;
+        }
+
+        if (!clothing.getTags().isEmpty()) {
+            clothing.getTags().clear();
+        }
+
+        for (String tagName : tagNames) {
+            if (tagName == null || tagName.trim().isEmpty()) {
+                continue;
+            }
+
+            Tag tag = tagRepository.findByName(tagName.trim())
+                    .orElseGet(() -> {
+                        Tag newTag = new Tag(tagName.trim());
+                        return tagRepository.save(newTag);
+                    });
+
+            clothing.addTag(tag);
         }
     }
 }
