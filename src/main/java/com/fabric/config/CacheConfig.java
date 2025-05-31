@@ -55,7 +55,21 @@ public class CacheConfig {
                         .maximumSize(100)
                         .build());
 
-        cacheManager.setCaches(List.of(userProfileCache, clothingCache, clothingQueryCache, clothingCategoriesCache, econtCitiesCache, econtOfficesCache, ordersCache));
+        CaffeineCache clothingByTagCache = new CaffeineCache("clothingByTag",
+                Caffeine.newBuilder()
+                        .maximumSize(100)
+                        .build());
+
+        cacheManager.setCaches(List.of(
+                userProfileCache,
+                clothingCache,
+                clothingQueryCache,
+                clothingCategoriesCache,
+                econtCitiesCache,
+                econtOfficesCache,
+                ordersCache,
+                clothingByTagCache
+        ));
         return cacheManager;
     }
 }
