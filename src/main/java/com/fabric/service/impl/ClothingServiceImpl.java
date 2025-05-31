@@ -100,9 +100,7 @@ public class ClothingServiceImpl implements ClothingService {
             return "Host";
         });
 
-        if (clothingDTO.getTags() != null && !clothingDTO.getTags().isEmpty()) {
-            processTags(clothingDTO.getTags(), clothing);
-        }
+        processTags(clothingDTO.getTags(), clothing);
 
         return CompletableFuture.allOf(hostUpload, cloudinaryUpload)
                 .thenApply(successSource -> {
@@ -195,9 +193,7 @@ public class ClothingServiceImpl implements ClothingService {
 
         List<Image> updatedImages = processImages(clothingDTO, clothing);
 
-        if (clothingDTO.getTags() != null && !clothingDTO.getTags().isEmpty()) {
-            processTags(clothingDTO.getTags(), clothing);
-        }
+        processTags(clothingDTO.getTags(), clothing);
 
         clothing.setImages(updatedImages);
         this.clothingRepository.save(clothing);
@@ -525,12 +521,10 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     private void processTags(List<String> tagNames, Clothing clothing) {
+        clothing.getTags().clear();
+
         if (tagNames == null || tagNames.isEmpty()) {
             return;
-        }
-
-        if (!clothing.getTags().isEmpty()) {
-            clothing.getTags().clear();
         }
 
         for (String tagName : tagNames) {
@@ -539,10 +533,7 @@ public class ClothingServiceImpl implements ClothingService {
             }
 
             Tag tag = tagRepository.findByName(tagName.trim())
-                    .orElseGet(() -> {
-                        Tag newTag = new Tag(tagName.trim());
-                        return tagRepository.save(newTag);
-                    });
+                    .orElseGet(() -> tagRepository.save(new Tag(tagName.trim())));
 
             clothing.addTag(tag);
         }
