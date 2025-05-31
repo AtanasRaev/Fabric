@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClothingValidationDTO {
     @NotBlank(message = "Name cannot be blank.")
     private String name;
@@ -31,6 +34,8 @@ public class ClothingValidationDTO {
     private MultipartFile frontImage;
 
     private MultipartFile backImage;
+
+    private List<String> tags = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -94,5 +99,13 @@ public class ClothingValidationDTO {
 
     public void setBackImage(MultipartFile backImage) {
         this.backImage = backImage;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }
