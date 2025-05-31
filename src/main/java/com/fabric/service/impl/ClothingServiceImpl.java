@@ -169,6 +169,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    @Transactional
     @Caching(evict = {
             @CacheEvict(value = "clothing", key = "#id"),
             @CacheEvict(value = "categories", allEntries = true),
