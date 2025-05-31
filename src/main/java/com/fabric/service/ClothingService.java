@@ -46,4 +46,6 @@ public interface ClothingService {
     Map<Type, Double> getDiscountPrices();
 
     Map<Type, List<Category>> getAllCategories();
+
+    Page<ClothingPageDTO> findByTagName(Pageable pageable, String tagName);
 }

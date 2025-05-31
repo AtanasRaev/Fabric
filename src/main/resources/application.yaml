@@ -54,7 +54,6 @@ app:
   ftpPort: ${FTP_PORT}
   ftpUser: ${FTP_USER}
   ftpPassword: ${FTP_PASSWORD}
-
 cloud:
   cloudName: ${CLOUD_NAME}
   apiKey: ${CLOUD_API_KEY}
