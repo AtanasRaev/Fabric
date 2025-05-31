@@ -206,6 +206,17 @@ public class ClothingController {
         return StringUtils.hasText(sort) ? getPageable(page, size, sort) : PageRequest.of(page - 1, size);
     }
 
+    @GetMapping("/by-tag/{tagName}")
+    public ResponseEntity<?> getByTagName(@PathVariable String tagName,
+                                          @RequestParam(defaultValue = "most-sold") String sort,
+                                          @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                          @RequestParam(defaultValue = "1") @Min(1) int page) {
+        Pageable pageable = getPageable(page, size, sort);
+        Page<ClothingPageDTO> clothesPage = this.clothingService.findByTagName(pageable, tagName);
+
+        return buildPagedResponse(clothesPage);
+    }
+
     private Page<ClothingPageDTO> getSearchPage(Pageable pageable, String name, List<String> type) {
         if (type != null && !type.isEmpty() && StringUtils.hasText(name)) {
             return this.clothingService.findByQuery(pageable, name, type);
