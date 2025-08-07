@@ -96,7 +96,7 @@ public class EmailServiceImpl implements EmailService {
                             item.getClothing().getModel(),
                             item.getSize(),
                             String.valueOf(item.getQuantity()),
-                            String.format("%.2f", item.getPrice())
+                            String.format("%.2f (€%.2f)", item.getPrice(), item.getPrice() / 1.95583)
                     );
                 })
                 .forEach(orderItem -> {
@@ -116,12 +116,12 @@ public class EmailServiceImpl implements EmailService {
         String[] date = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
                 .withZone(ZoneId.of("Europe/Sofia"))
                 .format(order.getCreatedAt()).split(" ");
-        String deliveryCost = order.getDeliveryCost() == 0 ? "Безплатна" : String.format("%.2f", order.getDeliveryCost()) + " лв";
+        String deliveryCost = order.getDeliveryCost() == 0 ? "Безплатна" : String.format("%.2f лв. (€%.2f)", order.getDeliveryCost(), order.getDeliveryCost() / 1.95583);
 
         return new JSONObject()
-                .put("subtotal", String.format("%.2f", order.getTotalPrice()))
+                .put("subtotal", String.format("%.2f (€%.2f)", order.getTotalPrice(), order.getTotalPrice() / 1.95583))
                 .put("shipping", deliveryCost)
-                .put("total", String.format("%.2f", order.getFinalPrice()))
+                .put("total", String.format("%.2f (€%.2f)", order.getFinalPrice(), order.getFinalPrice() / 1.95583))
                 .put("orderDate", date[0])
                 .put("orderDateHour", date[1])
                 .put("orderNumber", order.getId() + 600)
